@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="../css/default.css">
+  <link rel="stylesheet" href="../css/post.css">
+  <link rel="stylesheet" href="../css/story.css">
+  <link rel="stylesheet" href="../css/navbar.css">
+  <link rel="stylesheet" href="../css/side.css">
+  <script defer src="../js/navbar.js"></script>
+  <script defer src="../js/side.js"></script>
+  <style>
+    body {
+      background: rgb(250, 250, 250);
+    }
+
+    .whole-page {
+      position: relative;
+      top: 54px;
+      display: flex;
+      width: calc(100vw - 18px);
+    }
+
+    .whole-left-section {
+      width: 100%;
+    }
+
+    .whole-right-section {
+      display: none;
+    }
+
+    .box {
+      margin: 2rem auto 0 auto;
+    }
+
+    .post-whole {
+      margin: 2rem auto;
+    }
+
+    @media(min-width: 1000px) {
+      .box {
+        margin: 2rem 0 0 auto;
+      }
+
+      .post-whole {
+        margin: 2rem 0 1rem auto;
+      }
+
+      .whole-left-section {
+        width: 57.5%;
+      }
+
+      .whole-right-section {
+        position: fixed;
+        left: 57.5%;
+        padding: 1rem;
+        display: inline-block;
+        width: 42.5%;
+      }
+      .side{
+        margin-top: 2.2rem;
+      }
+    }
+
+    nav {
+      position: fixed;
+      left: 0;
+      top: 0;
+      right: 0;
+      z-index: 10;
+      height: 54px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 상단바 -->
+  <nav>
+    <div class="navbar">
+      <div class="logo">
+        <a href="#"><img src="../images/logo.png" /></a>
+      </div>
+
+      <div class="input-box">
+        <input type="search" class="search" placeholder="검색" />
+      </div>
+
+      <div class="menu">
+        <a href="#">
+          <svg aria-label="홈" class="home" fill="#262626" height="22" viewBox="0 0 48 48" width="22">
+            <path
+              d="M45.5 48H30.1c-.8 0-1.5-.7-1.5-1.5V34.2c0-2.6-2.1-4.6-4.6-4.6s-4.6 2.1-4.6 4.6v12.3c0 .8-.7 1.5-1.5 1.5H2.5c-.8 0-1.5-.7-1.5-1.5V23c0-.4.2-.8.4-1.1L22.9.4c.6-.6 1.6-.6 2.1 0l21.5 21.5c.3.3.4.7.4 1.1v23.5c.1.8-.6 1.5-1.4 1.5z">
+            </path>
+          </svg>
+        </a>
+
+        <a href="#">
+          <svg aria-label="Direct" class="DM" fill="#262626" height="22" viewBox="0 0 48 48" width="22">
+            <path
+              d="M47.8 3.8c-.3-.5-.8-.8-1.3-.8h-45C.9 3.1.3 3.5.1 4S0 5.2.4 5.7l15.9 15.6 5.5 22.6c.1.6.6 1 1.2 1.1h.2c.5 0 1-.3 1.3-.7l23.2-39c.4-.4.4-1 .1-1.5zM5.2 6.1h35.5L18 18.7 5.2 6.1zm18.7 33.6l-4.4-18.4L42.4 8.6 23.9 39.7z">
+            </path>
+          </svg>
+        </a>
+
+        <a href="#">
+          <svg aria-label="사람 찾기" class="compass" fill="#262626" height="22" viewBox="0 0 48 48" width="22">
+            <path clip-rule="evenodd"
+              d="M24 0C10.8 0 0 10.8 0 24s10.8 24 24 24 24-10.8 24-24S37.2 0 24 0zm0 45C12.4 45 3 35.6 3 24S12.4 3 24 3s21 9.4 21 21-9.4 21-21 21zm10.2-33.2l-14.8 7c-.3.1-.6.4-.7.7l-7 14.8c-.3.6-.2 1.3.3 1.7.3.3.7.4 1.1.4.2 0 .4 0 .6-.1l14.8-7c.3-.1.6-.4.7-.7l7-14.8c.3-.6.2-1.3-.3-1.7-.4-.5-1.1-.6-1.7-.3zm-7.4 15l-5.5-5.5 10.5-5-5 10.5z"
+              fill-rule="evenodd"></path>
+          </svg>
+        </a>
+
+        <a href="#">
+          <svg aria-label="활동 피드" class="feed" fill="#262626" height="22" viewBox="0 0 48 48" width="22">
+            <path
+              d="M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3m0-3c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5.6 0 1.1-.2 1.6-.5 1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z">
+            </path>
+          </svg>
+        </a>
+
+        <a href="#">
+          <img
+            src="https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-19/s150x150/83659355_3421811387894182_3823429373512384512_n.jpg?_nc_ht=scontent-ssn1-1.cdninstagram.com&amp;_nc_ohc=y-jM1QPyACgAX8OE_sY&amp;oh=a7c2299f3a418c0e6821804d199b852f&amp;oe=5F7913C6"
+            alt="프로필 사진" class="user_img" />
+        </a>
+      </div>
+    </div>
+  </nav>
+  <div class="whole-page">
+    <section class="whole-left-section">
+      <!-- 스토리 -->
+      <div class="box">
+        <input type="button" class="story-switch story-switch-left" value="‹" />
+        <div class="itembox">
+          <div class="item">
+            <img class="item_img" src="../images/images1.jpg" />
+          </div>
+          <div class="story_id">e__n_j__g</div>
+        </div>
+
+        <div class="itembox">
+          <div class="item">
+            <img class="item_img" src="../images/images2.jpg" />
+          </div>
+          <div class="story_id">sOO2me</div>
+        </div>
+
+        <div class="itembox">
+          <div class="item">
+            <img class="item_img" src="../images/images3.jpg" />
+          </div>
+          <div class="story_id">Hyo__jin</div>
+        </div>
+
+        <div class="itembox">
+          <div class="item">
+            <img class="item_img" src="../images/images4.jpg" />
+          </div>
+          <div class="story_id">ssssong___)</div>
+        </div>
+
+        <div class="itembox">
+          <div class="item">
+            <img class="item_img" src="../images/images5.jpg" />
+          </div>
+          <div class="story_id">imdea__:)</div>
+        </div>
+
+        <div class="itembox">
+          <div class="item">
+            <img class="item_img" src="../images/images6.jpg" />
+          </div>
+          <div class="story_id">:__:jin</div>
+        </div>
+
+        <div class="itembox">
+          <div class="item">
+            <img class="item_img" src="../images/images7.jpg" />
+          </div>
+          <div class="story_id">dlrkgmlz</div>
+        </div>
+
+        <div class="itembox">
+          <div class="item">
+            <img class="item_img" src="../images/images8.jpg" />
+          </div>
+          <div class="story_id">gywls:)</div>
+        </div>
+
+        <div class="itembox">
+          <div class="item">
+            <img class="item_img" src="../images/images9.jpg" />
+          </div>
+          <div class="story_id">&guswns&</div>
+        </div>
+
+        <div class="itembox">
+          <div class="item">
+            <img class="item_img" src="../images/images10.jpg" />
+          </div>
+          <div class="story_id">ddd__p</div>
+        </div>
+        <input type="button" class="story-switch story-switch-right" value="›" />
+      </div>
+      <script src="../js/stroy.js"></script>
+      <!-- 메인 컨텐트 -->
+      <div id="sticker">
+        
+
+      <!-- <div class="post-whole">
+        post header
+        <section class="post-header">
+          <div class="post-header-list">
+            <a href="#" style="background-image: url('../images/프로필얼굴.png')" class="post-header-image"></a>
+          </div>
+          <div class="post-header-list">
+            <a href="#" class="post-header-id">Clone-Instagram</a>
+          </div>
+          <div class="post-header-list">
+            <svg class="modal-button" fill="#262626" height="16" viewBox="0 0 48 48" width="16">
+              <circle clip-rule="evenodd" cx="8" cy="24" fill-rule="evenodd" r="4.5"></circle>
+              <circle clip-rule="evenodd" cx="24" cy="24" fill-rule="evenodd" r="4.5"></circle>
+              <circle clip-rule="evenodd" cx="40" cy="24" fill-rule="evenodd" r="4.5"></circle>
+            </svg>
+          </div>
+        </section>
+        슬라이더
+        <div class="test-container">
+          <div class="container">
+            <ul class="slide-list">
+               <li class="slide-item"></li>
+              <li class="slide-item"></li>
+              <li class="slide-item"></li>
+            </ul>
+            <input type="button" class='switch slide-switch-left' value="‹">
+            <input type="button" class='switch slide-switch-right' value="›">
+          </div>
+        </div>
+        중간 네비바
+        <section class="middle-nav">
+          <div class="middle-nav-list">
+            <svg aria-label="좋아요" class="like-btn" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
+              <path
+                d="M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3m0-3c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5.6 0 1.1-.2 1.6-.5 1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z">
+              </path>
+            </svg>
+          </div>
+          <div class="middle-nav-list">
+            <svg aria-label="댓글 달기" class="comment-btn" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
+              <path clip-rule="evenodd"
+                d="M47.5 46.1l-2.8-11c1.8-3.3 2.8-7.1 2.8-11.1C47.5 11 37 .5 24 .5S.5 11 .5 24 11 47.5 24 47.5c4 0 7.8-1 11.1-2.8l11 2.8c.8.2 1.6-.6 1.4-1.4zm-3-22.1c0 4-1 7-2.6 10-.2.4-.3.9-.2 1.4l2.1 8.4-8.3-2.1c-.5-.1-1-.1-1.4.2-1.8 1-5.2 2.6-10 2.6-11.4 0-20.6-9.2-20.6-20.5S12.7 3.5 24 3.5 44.5 12.7 44.5 24z"
+                fill-rule="evenodd"></path>
+            </svg>
+          </div>
+          <div class="middle-nav-list">
+            <svg aria-label="게시물 공유" class="share-btn" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
+              <path
+                d="M47.8 3.8c-.3-.5-.8-.8-1.3-.8h-45C.9 3.1.3 3.5.1 4S0 5.2.4 5.7l15.9 15.6 5.5 22.6c.1.6.6 1 1.2 1.1h.2c.5 0 1-.3 1.3-.7l23.2-39c.4-.4.4-1 .1-1.5zM5.2 6.1h35.5L18 18.7 5.2 6.1zm18.7 33.6l-4.4-18.4L42.4 8.6 23.9 39.7z">
+              </path>
+            </svg>
+          </div>
+          <div class="middle-nav-list">
+            <svg aria-label="저장" class="bookmark-btn" fill="#262626" height="24" viewBox="0 0 48 48" width="24">
+              <path
+                d="M43.5 48c-.4 0-.8-.2-1.1-.4L24 29 5.6 47.6c-.4.4-1.1.6-1.6.3-.6-.2-1-.8-1-1.4v-45C3 .7 3.7 0 4.5 0h39c.8 0 1.5.7 1.5 1.5v45c0 .6-.4 1.2-.9 1.4-.2.1-.4.1-.6.1zM24 26c.8 0 1.6.3 2.2.9l15.8 16V3H6v39.9l15.8-16c.6-.6 1.4-.9 2.2-.9z">
+              </path>
+            </svg>
+          </div>
+        </section>
+        포스트 컨텐트
+        <section class="post-content">
+          <a href="#">Clone-Instagram</a>
+          <p class="post-user-content">안녕하세요 저희는 클론인스타그램입니다. 많이 사랑부탁드리며 활발한 활동하겠습니다.
+            저희의 구성원은 조인태 권용 안덕우 이가희 김효진 입니다.
+            저희는 인스타그램을 클론 코딩하여 구현하고자 합니다. 감사합니다.
+          </p>
+          <span class="view-more">더 보기</span>
+        </section>
+        포스트 댓글
+        <section class="post-comment">
+          <p href="#" class="whole-comment">댓글 더보기...</p>
+          <ul class="comment-list">
+            <li class="comment-item">
+              <a href="" class="comment-list-link">YongYong</a>
+              <span class="comment-list-content">권지용보다 권용</span>
+            </li>
+            <li class="comment-item">
+              <a href="" class="comment-list-link">DuckWoo</a>
+              <span class="comment-list-content">너무 멋지네요</span>
+            </li>
+          </ul>
+          <div class="comment-input-box">
+            <input type="text" class="comment-input" placeholder="댓글 달기">
+            <input type="submit" class="comment-submit" value="게시">
+          </div>
+        </section>
+      </div> -->
+    </div>
+      <!-- 모달 -->
+      <div class="modal-container">
+        <!-- 
+      부적절한 콘텐츠 신고
+      팔로우 취소
+      게시물로 이동
+      공유하기
+      링크 복사
+      퍼가기
+      취소
+     -->
+        <div class="modal-box">
+          <button class="modal-menu report">부적절한 콘텐츠 신고</button>
+          <button class="modal-menu cancle-follow">팔로우 취소</button>
+          <button class="modal-menu move-post">게시물로 이동</button>
+          <button class="modal-menu share">공유하기</button>
+          <button class="modal-menu copy-link">링크 복사</button>
+          <button class="modal-menu fork">퍼가기</button>
+          <button class="modal-menu cancle">취소</button>
+        </div>
+      </div>
+
+    </section>
+    <section class="whole-right-section">
+      <!-- 우측 컨텐트 -->
+      <div class="side">
+        <div class="side_user">
+          <div class="side_user_img">
+            <a href="#">
+              <img src="" alt="프로필 사진" class="side_img" />
+            </a>
+          </div>
+          <div class="side_user_info">
+            <a href="#"></a>
+            <div></div>
+            <p class="logout" style="margin-top: 0.5rem;font-size:0.8rem; color: dodgerblue; cursor: pointer;">로그아웃</p>
+          </div>
+        </div>
+
+        <div class="side_recommend">
+          <div class="recommend">
+            <div>회원님을 위한 추천</div>
+            <a href="#">모두 보기</a>
+          </div>
+
+          <div class="side_recommend_list">
+            <div class="side_user_img">
+              <a href="#">
+                <img
+                  src="https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-19/s150x150/83659355_3421811387894182_3823429373512384512_n.jpg?_nc_ht=scontent-ssn1-1.cdninstagram.com&amp;_nc_ohc=y-jM1QPyACgAX8OE_sY&amp;oh=a7c2299f3a418c0e6821804d199b852f&amp;oe=5F7913C6"
+                  alt="프로필 사진" class="recommend_img" />
+              </a>
+            </div>
+            <div class="recommend_info">
+              <a href="#">dlrkgmlz</a>
+              <div>가희</div>
+            </div>
+
+            <button>
+              <div class="follow_button">팔로우</div>
+            </button>
+          </div>
+
+          <div class="side_recommend_list">
+            <div class="side_user_img">
+              <a href="#">
+                <img
+                  src="https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-19/s150x150/83659355_3421811387894182_3823429373512384512_n.jpg?_nc_ht=scontent-ssn1-1.cdninstagram.com&amp;_nc_ohc=y-jM1QPyACgAX8OE_sY&amp;oh=a7c2299f3a418c0e6821804d199b852f&amp;oe=5F7913C6"
+                  alt="프로필 사진" class="recommend_img" />
+              </a>
+            </div>
+            <div class="recommend_info">
+              <a href="#">dlrkgmlz</a>
+              <div>가희</div>
+            </div>
+
+            <button>
+              <div class="follow_button">팔로우</div>
+            </button>
+          </div>
+
+          <div class="side_recommend_list">
+            <div class="side_user_img">
+              <a href="#">
+                <img
+                  src="https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-19/s150x150/83659355_3421811387894182_3823429373512384512_n.jpg?_nc_ht=scontent-ssn1-1.cdninstagram.com&amp;_nc_ohc=y-jM1QPyACgAX8OE_sY&amp;oh=a7c2299f3a418c0e6821804d199b852f&amp;oe=5F7913C6"
+                  alt="프로필 사진" class="recommend_img" />
+              </a>
+            </div>
+            <div class="recommend_info">
+              <a href="#">dlrkgmlz</a>
+              <div>가희</div>
+            </div>
+
+            <button>
+              <div class="follow_button">팔로우</div>
+            </button>
+          </div>
+
+          <div class="side_recommend_list">
+            <div class="side_user_img">
+              <a href="#">
+                <img
+                  src="https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-19/s150x150/83659355_3421811387894182_3823429373512384512_n.jpg?_nc_ht=scontent-ssn1-1.cdninstagram.com&amp;_nc_ohc=y-jM1QPyACgAX8OE_sY&amp;oh=a7c2299f3a418c0e6821804d199b852f&amp;oe=5F7913C6"
+                  alt="프로필 사진" class="recommend_img" />
+              </a>
+            </div>
+            <div class="recommend_info">
+              <a href="#">dlrkgmlz</a>
+              <div>가희</div>
+            </div>
+
+            <button>
+              <div class="follow_button">팔로우</div>
+            </button>
+          </div>
+
+          <div class="side_recommend_list">
+            <div class="side_user_img">
+              <a href="#">
+                <img
+                  src="https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-19/s150x150/83659355_3421811387894182_3823429373512384512_n.jpg?_nc_ht=scontent-ssn1-1.cdninstagram.com&amp;_nc_ohc=y-jM1QPyACgAX8OE_sY&amp;oh=a7c2299f3a418c0e6821804d199b852f&amp;oe=5F7913C6"
+                  alt="프로필 사진" class="recommend_img" />
+              </a>
+            </div>
+            <div class="recommend_info">
+              <a href="#">dlrkgmlz</a>
+              <div>가희</div>
+            </div>
+
+            <button>
+              <div class="follow_button">팔로우</div>
+            </button>
+          </div>
+        </div>
+
+        <div class="side_link">
+          <div class="link">
+            <a href="#">소개</a>
+            <a href="#">도움말</a>
+            <a href="#">홍보 센터</a>
+            <a href="#">API</a>
+            <a href="#">채용 정보</a>
+            <br />
+            <a href="#">개인정보처리방침</a>
+            <a href="#">약관</a>
+            <a href="#">위치</a>
+            <a href="#">인기 계정</a>
+            <a href="#">해시태그</a>
+            <a href="#">언어</a>
+          </div>
+          <span>© 2020 INSTAGRAM FROM FACEBOOK</span>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="../js/mainFront.js"></script>
+  <!-- <script src="../js/slider.js"></script> -->
+  <!-- <script src="../js/modal.js"></script> -->
+  <script src="../js/comment-click.js"></script>
+</body>
+
+</html>
