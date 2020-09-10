@@ -22,7 +22,7 @@ app.use(session({
 const db = mysql.createConnection({
   hosts: 'localhost',
   user: 'root',
-  password: '',
+  password: 'dnflwlq1@#',
   database: 'instagram'
 });
 // DB연결
