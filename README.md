@@ -120,9 +120,15 @@
 
 5. JS
 
+ - Front (AJAX - axios API)
+
 ```javascript
 const login = await axios.post('/login', { id, password }); // axios API를 이용 / async-await을 활용하여 비동기 환경에서 동기처리
+```
 
+ - Back (express + mysql)
+
+```javascript
 app.use(session({ // 로그인 시 세션을 파일로 저장
   secret: '', 
   resave: false, 
