@@ -79,7 +79,7 @@ html {
 .modal-menu:nth-child(2) {
   color: crimson;
 }
-.modal-menu:nth-child(7){
+.modal-menu:nth-child(3){
   border-bottom: 0;
 }
 @media (max-width: 800px) {
@@ -87,7 +87,45 @@ html {
     width: 18rem;
   }
 }
-
+.userModal-container {
+  z-index :20;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  display:none;
+}
+.userModal-box {
+  background: white;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.7rem;
+  /* justify-content: center; */
+}
+.userModal-menu {
+  font-family: 'Noto Sans KR', sans-serif;
+  width: 28rem;
+  height: 3.3rem;
+  font-size: 1rem;
+  font-weight: 200;
+  border-bottom: 0.5px solid #ddd;
+}
+.userModal-menu:nth-child(1) {
+  color: crimson;
+}
+.userModal-menu:nth-child(2){
+  border-bottom: 0;
+}
+@media (max-width: 800px) {
+  .userModal-menu{
+    width: 18rem;
+  }
+}
 /* 중간 네비바 */
 
 .middle-nav{

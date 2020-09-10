@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="../css/story.css">
   <link rel="stylesheet" href="../css/navbar.css">
   <link rel="stylesheet" href="../css/side.css">
+  <link rel="stylesheet" href="../css/insert.css">
   <script defer src="../js/navbar.js"></script>
   <script defer src="../js/side.js"></script>
   <style>
@@ -298,31 +299,27 @@
           </div>
         </section>
       </div> -->
-    </div>
+      </div>
       <!-- 모달 -->
       <div class="modal-container">
-        <!-- 
-      부적절한 콘텐츠 신고
-      팔로우 취소
-      게시물로 이동
-      공유하기
-      링크 복사
-      퍼가기
-      취소
-     -->
         <div class="modal-box">
-          <button class="modal-menu report">부적절한 콘텐츠 신고</button>
-          <button class="modal-menu cancle-follow">팔로우 취소</button>
-          <button class="modal-menu move-post">게시물로 이동</button>
-          <button class="modal-menu share">공유하기</button>
-          <button class="modal-menu copy-link">링크 복사</button>
-          <button class="modal-menu fork">퍼가기</button>
+          <button class="modal-menu report">팔로우 취소</button>
+          <button class="modal-menu cancle-follow">북마크</button>
+          <!-- <button class="modal-menu move-post">게시물로 이동</button>
+                <button class="modal-menu share">공유하기</button>
+                <button class="modal-menu copy-link">링크 복사</button>
+                <button class="modal-menu fork">퍼가기</button> -->
           <button class="modal-menu cancle">취소</button>
         </div>
       </div>
-
-    </section>
-    <section class="whole-right-section">
+      <div class="userModal-container">
+        <div class="userModal-box">
+          <button class="userModal-menu cancle-follow" id="delete-post">게시글 삭제</button>
+          <button class="userModal-menu cancle">취소</button>
+        </div>
+      </div>
+      </section>
+      <section class="whole-right-section">
       <!-- 우측 컨텐트 -->
       <div class="side">
         <div class="side_user">
@@ -454,6 +451,15 @@
         </div>
       </div>
     </section>
+    <div class="insert-box">
+      <form action="/insert" class="insert-form" method="POST" enctype="multipart/form-data">
+        <p>게시물 등록</p>
+        <input type="file" name="images" class="insert-post-file" multiple>
+        <textarea class="insert-post-text" name="content"></textarea>
+        <input type="submit" class="post-submit">
+      </form>
+    </div>
+    <div class="insert-button"><span>+</span></div>
   </div>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <script src="../js/mainFront.js"></script>
