@@ -116,7 +116,7 @@
 
 4. 회원가입 페이지
 
-  <img src="./images/loginPage.gif" width="600px;">
+  <img src="./images/회원가입.PNG" width="600px;">
 
 5. JS
 

@@ -4,7 +4,6 @@ const path = require('path');
 const mysql = require('mysql');
 const fs = require('fs').promises;
 const session = require('express-session');
-const { response } = require('express');
 const FileStore = require('session-file-store')(session);
 const app = new express();
 app.use(express.static('public'));
