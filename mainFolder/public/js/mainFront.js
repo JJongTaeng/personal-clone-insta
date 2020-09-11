@@ -16,7 +16,8 @@ window.addEventListener('load', async () => {
   // 우측 사이드 프로필
   userInfo.children[0].innerHTML = main.data.nick;
   userInfo.children[1].innerHTML = main.data.name;
-  document.querySelector('.side_img').setAttribute('src', `./${main.data.id}/${main.data.profile[0]}`)
+  // document.querySelector('.side_img').setAttribute('src', `./${main.data.id}/${main.data.profile[0]}`);
+  document.querySelector('.profile-image-label').style.backgroundImage=`url('./${main.data.id}/${main.data.profile[0]}')`
   const slideHTML = await fetch('../lib/slide');
   if (slideHTML.status === 200) {
     slide_text = await slideHTML.text();
@@ -120,6 +121,7 @@ window.addEventListener('load', async () => {
     for (let i = 0; i < postWhole.length; i++) {
       modalSVG[i].addEventListener('click',async (e) => {
         let userPostId = e.currentTarget.parentNode.parentNode.parentNode.id.split('-');
+        console.log(userPostId);
         await axios.post('/delete', {userPostId});
         if(userPostId[0] === main.data.id){
           userModal_container.style.display = 'flex';

@@ -29,10 +29,10 @@ html {
   width: 35px;
   height: 35px;
   background-position: center;
-  background-size: contain;
+  background-size: cover;
   background-repeat: no-repeat;
   margin-left: 0.7rem;
-  border: 1px solid gold;
+  border: 1px solid #eee;
   border-radius: 50%;
 }
 .post-header-list:nth-child(2){

@@ -9,6 +9,7 @@ const session = require('express-session');
 const FileStore = require('session-file-store')(session);
 const app = new express();
 let postImageLink;
+let profileImageLink;
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -22,7 +23,7 @@ app.use(session({
 const db = mysql.createConnection({
   hosts: 'localhost',
   user: 'root',
-  password: 'dnflwlq1@#',
+  password: '',
   database: 'instagram'
 });
 // DB연결
@@ -32,13 +33,19 @@ app.use((req, res, next)=>{
     if(data.length ===0){
       req.postImageLink = 1;
       postImageLink= req.postImageLink;
+      profileImageLink = req.session.idname;
     } else {
       req.postImageLink = data[0].post_id + 1;
       postImageLink= req.postImageLink;
+      profileImageLink = req.session.idname;
     }
     next();
   });
-})
+});
+app.get('/error', async (req, res)=>{
+  const data = await fs.readFile('./public/html/error.html');
+  res.end(data);
+});
 app.get('/', async (req, res)=>{
   const data = await fs.readFile('./public/html/login.html');
   req.session.is_logined = false;
@@ -88,7 +95,17 @@ app.get('/main_data', async (req, res)=>{
     }
   })
 })
-
+app.get('/search', async (req, res, next)=>{
+  try{
+    db.query(`select user.id, nickname, following_id from user left join following on following.id = '${req.session.idname}' and user.id = following.following_id where not user.id='${req.session.idname}' and (user.id like '%${req.session.searchData.search_text}%' or user.nickname like '%${req.session.searchData.search_text}%')`,(err,data)=>{
+      if(err) next(new Error('검색오류'));
+      return res.end(JSON.stringify(data));
+    })
+  } catch(err) {
+    next(new Error('검색오류'));
+  }
+  
+})
 app.get('/logout', async (req, res)=>{
   await req.session.destroy((err)=>{
     return res.end('logout');
@@ -97,36 +114,45 @@ app.get('/logout', async (req, res)=>{
 
 app.post('/login', async (req, res)=>{
   const user = req.body;
+  let isLogin = false;
   db.query(`select * from user`, (err, data)=> {
     for(let i =0; i<data.length; i++){
       if(data[i].id === user.id && data[i].password === user.password){
+        isLogin = true;
         req.session.is_logined = true;
         req.session.idname = user.id;
         req.session.nickname = data[i].nickname;
         req.session.realname = data[i].name;   
         req.session.save(()=>{
-          return res.end('success');
         })
       }
     }
-    console.log(req.session.is_logined);
-    if(!req.session.is_logined) {
-      console.log('fail')
+    if(!isLogin) {
       return res.end('fail');
+    } else {
+      return res.end('success');
     }
   });
-
 });
-app.post('/signup_process', (req, res)=> {
+app.post('/signup_process', (req, res, next)=> {
   const user = req.body;
-  db.query(`insert into user (id, password, nickname, name) values ('${user.id}', '${user.password}', '${user.nickname}', '${user.name}');`,(err, data)=>{
-    db.query(`insert into following values ('${user.id}','${user.id}')`, (err, data2)=>{
-      if(err){
-        res.send('회원가입 실패 - 다시해주십시오');
-      }
-      fs2.mkdirSync(`./public/${user.id}`);
-      res.redirect('/');
-    })
+  db.query(`insert into user (id, password, nickname, name) values ('${user.id}', '${user.password}', '${user.nickname}', '${user.name}');`,(err1, data1)=>{
+    if(err1){
+      next(new Error('아이디가 중복됩니다.'));
+    } else {
+
+      db.query(`insert into following values ('${user.id}','${user.id}')`, (err2, data2)=>{
+        if(err2){
+          next(new Error('아이디가 중복됩니다.'));
+        } 
+        try{
+          fs2.mkdirSync(`./public/${user.id}`);
+          res.redirect('/')
+        }catch(err){
+          next(new Error('아이디가 중복됩니다.'));
+        }   
+      })
+    }
   })
 })
 let fileIndex =1;
@@ -165,9 +191,54 @@ app.post('/insert', async (req, res, next)=>{
     })
   });
 });
-
+let profile_upload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, done) {
+      done(null, `./public/${profileImageLink}`);
+    },
+    filename(req, file, done) {
+      const ext = '.jpg';
+      done(null, 1 + ext);
+    },
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
+app.post('/changeProfile', async (req, res, next)=>{
+  try {
+    fs2.readdirSync(`./public/${req.session.idname}`);
+    
+  } catch (error) {
+    console.error('uploads 폴더가 없어 uploads 폴더를 생성합니다.');
+    fs2.mkdirSync(`./public/${req.session.idname}`);
+  }
+  console.log('폴더 생성후 파일 저장하러갑니다!')
+  next();
+},profile_upload.single('profile'), (req, res) => {    
+  console.log(req.file, req.body); 
+  res.redirect('/main');
+});
+app.post('/search', async (req, res)=>{
+  req.session.searchData = req.body;
+  const data = await fs.readFile('./public/html/search.html');
+  res.end(data);
+})
+app.post('/add_following', (req, res, next)=>{
+  const user = req.body.followingIndex;
+  db.query(`insert into following values ('${req.session.idname}','${user.split('-')[0]}')`, (err, data)=>{
+    if(err) next(new Error('팔로잉 실패'));
+    return res.end();
+  })
+})
+app.post('/cancel_following', (req, res, next)=>{
+  const user = req.body.followingIndex;
+  db.query(`delete from following where id='${req.session.idname}' and following_id = '${user.split('-')[0]}'`, (err, data)=>{
+    if(err) next(new Error('팔로잉 실패'));
+    return res.end();
+  })
+})
 app.post('/delete', (req, res)=>{
   const user = req.body;
+  console.log(user)
   req.session.deletePostId = user;
   return res.end();
 });
@@ -187,5 +258,8 @@ app.post('/delete_process', (req, res)=>{
       }
     });
   })
+})
+app.use((err, req, res, next)=>{
+  res.redirect('/error');
 })
 app.listen(3000,()=>console.log('3000 포트 대기'))

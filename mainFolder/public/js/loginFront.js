@@ -14,7 +14,7 @@ async function loadFile() {
       location.href="/main";
     } else {
       console.log(login.data);
-      alert('로그인 오류');
+      alert('아이디 / 비밀번호를 확인해주세요.');
       location.href="/";
     }
   });
