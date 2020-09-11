@@ -13,6 +13,10 @@
 
 ```
 
+### 전체 기능 시연
+
+  <img src="./images/기능시연.gif" width="800px;">
+
 ### ToDoList
 
   - [x] ~~로그인 UI 구현~~  <small>*2020/08/24*</small>
@@ -121,60 +125,49 @@
    ```
    
 
-2. 메인 페이지
 
-  <img src="./images/메인페이지.gif" width="600px;" height="400px">
+### JS
 
-3. 로그인 페이지
+  - Front (AJAX - axios API)
 
-  <img src="./images/loginPage.gif" width="600px;">
+    ```javascript
+    const login = await axios.post('/login', { id, password }); // axios API를 이용 / async-await을 활용하여 비동기 환경에서 동기처리
+    ```
 
-4. 회원가입 페이지
+  - Back (express + mysql)
 
-  <img src="./images/회원가입.PNG" width="600px;">
+    ```javascript
+    app.use(session({ // 로그인 시 세션을 파일로 저장
+      secret: '', 
+      resave: false, 
+      saveUninitialized: true,
+      store: new FileStore(),
+    }));
 
-5. JS
+    const db = mysql.createConnection({ // mysql 모듈을 이용하여 DB사용
+      hosts: 'localhost',
+      user: '',
+      password: '',
+      database: 'instagram'
+    }); // DB연결
 
- - Front (AJAX - axios API)
+    app.use(express.static('public')); // express를 이용한 public내에 있는 정적파일 접근
 
-```javascript
-const login = await axios.post('/login', { id, password }); // axios API를 이용 / async-await을 활용하여 비동기 환경에서 동기처리
-```
+    app.get('/main', async (req, res, next)=>{ // express 라우터와 미들웨어를 활용하여 서버 구현 
+      try{
+        if(req.session.idname){
+          const data = await fs.readFile('./public/html/main.html');
+          return res.end(data);
+        } else{
+          res.redirect('/');
+        }
+      } catch(err) {
+        console.error(err);
+        res.redirect('/')
+      }
+    });
 
- - Back (express + mysql)
-
-```javascript
-app.use(session({ // 로그인 시 세션을 파일로 저장
-  secret: '', 
-  resave: false, 
-  saveUninitialized: true,
-  store: new FileStore(),
-}));
-
-const db = mysql.createConnection({ // mysql 모듈을 이용하여 DB사용
-  hosts: 'localhost',
-  user: '',
-  password: '',
-  database: 'instagram'
-}); // DB연결
-
-app.use(express.static('public')); // express를 이용한 public내에 있는 정적파일 접근
-
-app.get('/main', async (req, res, next)=>{ // express 라우터와 미들웨어를 활용하여 서버 구현 
-  try{
-    if(req.session.idname){
-      const data = await fs.readFile('./public/html/main.html');
-      return res.end(data);
-    } else{
-      res.redirect('/');
-    }
-  } catch(err) {
-    console.error(err);
-    res.redirect('/')
-  }
-});
-
-```
+    ```
 
 ### 게시글 구현
  - 게시글을 불러올 때 post index를 내림차순으로 불러와서 최신순으로 정렬한다.
@@ -188,6 +181,3 @@ app.get('/main', async (req, res, next)=>{ // express 라우터와 미들웨어�
  - 유저 검색기능은 DB에서 where id like = '%%' 와 같이 포함된 문자열에 대한 데이터를 조회했다.
  - 팔로잉 기능은 팔로잉 시 insert를 하였고, 팔로잉을 취소할 시 delete하였다.
 
-### 전체 기능 시연
-
-  <img src="./images/기능시연.gif" width="800px;">
