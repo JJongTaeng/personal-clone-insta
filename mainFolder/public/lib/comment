@@ -1,0 +1,5 @@
+<li class="comment-item">
+  <a href="" class="comment-list-link">ID</a>
+  <span class="comment-list-content">Content</span>
+  <span class="comment-date">날짜</span>
+</li>

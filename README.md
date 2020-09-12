@@ -15,7 +15,7 @@
 
 ### 전체 기능 시연
 
-  <img src="./images/기능시연.gif" width="800px;">
+  <img src="./images/시연.gif" width="800px;">
 
 ### ToDoList
 
@@ -31,7 +31,9 @@
   - [x] ~~팔로우/팔로워 기능~~  <small>*2020/09/11*</small>
   - [x] ~~검색 기능~~ <small>*2020/09/11*</small>
   - [x] ~~프로필 이미지 변경~~ <small>*2020/09/11*</small>
-  - [ ] 댓글 CRUD
+  - [x] ~~댓글~~ <small>*2020/09/12*</small>
+  - [x] ~~좋아요기능~~ <small>*2020/09/12*</small>
+  - [x] ~~스토리 박스 클릭 시 해당 게시물로 이동~~ <small>*2020/09/12*</small>
 
 
 1. DB

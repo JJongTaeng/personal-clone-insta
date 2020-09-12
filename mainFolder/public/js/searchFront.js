@@ -1,6 +1,6 @@
 window.addEventListener('load', async ()=>{
   console.log(document.body.children.length);
-  const search = await axios.get('/search');
+  const search = await axios.get('/search_data');
   console.log(search.data);
   const searchBox = document.querySelector('.search-people-box');
   const searchUlTag = document.querySelector('.search-people-list');

@@ -160,7 +160,7 @@ html {
 /* 게시글 내용 */
 .post-content {
   display: flex;
-  
+  margin-bottom : 1rem;
 }
 .post-content a {
   font-family: 'Noto Sans KR', sans-serif;
@@ -171,7 +171,7 @@ html {
   margin: 0 0.5rem;
   font-size: 0.8rem;
 }
-.post-content span {
+.view-more {
   margin-right: 0.5rem;
   font-family: 'Noto Sans KR', sans-serif;
   color: #aaa;
@@ -187,6 +187,14 @@ html {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.8rem;
+}
+.content-date {
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  margin-right: 0.5rem;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #aaa;
+  margin-left: auto;
 }
 /* 게시글 댓글 */
 
@@ -205,10 +213,11 @@ html {
   font-size: 0.7rem;
   text-decoration: none;
   padding: 0 0.5rem;
-  cursor: pointer;
 }
 .comment-item {
+  margin:0.3rem 0;
   padding: 0 0.5rem;
+  display: flex;
 }
 .comment-list-content {
   color: #333;
@@ -232,6 +241,11 @@ html {
   align-items: center;
   height: 3rem;
   margin-top: 1rem;
+}
+.comment-date {
+  margin-left: auto;
+  color: #bbb;
+  font-size: 0.7rem;
 }
 /* 최근 좋아요 */
 .recent-like {

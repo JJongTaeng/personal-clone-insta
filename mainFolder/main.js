@@ -95,7 +95,26 @@ app.get('/main_data', async (req, res)=>{
     }
   })
 })
-app.get('/search', async (req, res, next)=>{
+
+app.get('/comment_data', (req, res)=>{
+  db.query(`select post_comment.id, post_comment.post_id,post_comment.nickname, post_comment.comment, post_comment.upload_date from post left join post_comment on post.post_id = post_comment.post_id  where post.id in (select following_id from following where id ="${req.session.idname}") and post_comment.post_id in (select post_id from post_comment) order by post_comment.post_id desc, post_comment.upload_date asc;`, (err, data)=>{
+    if(err) next(new Error('댓글 불러오기 오류'));
+    return res.end(JSON.stringify(data));
+  })
+})
+// 좋아요 READ 라우터
+app.get('/like_process', (req, res)=>{
+  db.query(`select * from post_likes where likes_id ='${req.session.idname}' order by post_id desc`, (err1, data1)=>{
+    if(err1) next(new Error('좋아요 불러오기 실패'));
+    db.query(`select * from post_likes order by post_id desc`, (err2, data2)=>{
+      const data = {data1, data2};
+      if(err2) next(new Error('좋아요 불러오기 실패'));
+      return res.end(JSON.stringify(data));
+    })
+  })
+})
+
+app.get('/search_data', async (req, res, next)=>{
   try{
     db.query(`select user.id, nickname, following_id from user left join following on following.id = '${req.session.idname}' and user.id = following.following_id where not user.id='${req.session.idname}' and (user.id like '%${req.session.searchData.search_text}%' or user.nickname like '%${req.session.searchData.search_text}%')`,(err,data)=>{
       if(err) next(new Error('검색오류'));
@@ -104,14 +123,16 @@ app.get('/search', async (req, res, next)=>{
   } catch(err) {
     next(new Error('검색오류'));
   }
-  
 })
+
+//로그아웃 라우터
 app.get('/logout', async (req, res)=>{
   await req.session.destroy((err)=>{
     return res.end('logout');
   });
 })
 
+// 로그인라우터
 app.post('/login', async (req, res)=>{
   const user = req.body;
   let isLogin = false;
@@ -134,6 +155,8 @@ app.post('/login', async (req, res)=>{
     }
   });
 });
+
+// 회원가입 라우터
 app.post('/signup_process', (req, res, next)=> {
   const user = req.body;
   db.query(`insert into user (id, password, nickname, name) values ('${user.id}', '${user.password}', '${user.nickname}', '${user.name}');`,(err1, data1)=>{
@@ -168,7 +191,7 @@ let upload = multer({
   }),
   limits: { fileSize: 5 * 1024 * 1024 },
 });
-
+// 게시글 업로드 라우터
 app.post('/insert', async (req, res, next)=>{
   try {
     fs2.readdirSync(`./public/${req.postImageLink}`);
@@ -203,6 +226,7 @@ let profile_upload = multer({
   }),
   limits: { fileSize: 5 * 1024 * 1024 },
 });
+// 프로필 변경라우터
 app.post('/changeProfile', async (req, res, next)=>{
   try {
     fs2.readdirSync(`./public/${req.session.idname}`);
@@ -217,11 +241,23 @@ app.post('/changeProfile', async (req, res, next)=>{
   console.log(req.file, req.body); 
   res.redirect('/main');
 });
+
+// 댓글 업로드 라우터
+app.post('/insert_comment', (req, res)=>{
+  const comment = req.body;
+  db.query(`insert into post_comment (id, nickname, post_id, comment) values ('${req.session.idname}','${req.session.nickname}',${comment.postID},'${comment.comment_content}')`, (err, data)=>{
+    if(err) next(new Error('댓글 등록 실패'));
+    res.redirect('/main');
+  })
+})
+
+// 검색 라우터
 app.post('/search', async (req, res)=>{
   req.session.searchData = req.body;
   const data = await fs.readFile('./public/html/search.html');
   res.end(data);
 })
+// 팔로잉 라우터
 app.post('/add_following', (req, res, next)=>{
   const user = req.body.followingIndex;
   db.query(`insert into following values ('${req.session.idname}','${user.split('-')[0]}')`, (err, data)=>{
@@ -229,13 +265,30 @@ app.post('/add_following', (req, res, next)=>{
     return res.end();
   })
 })
+//팔로잉 취소라우터
 app.post('/cancel_following', (req, res, next)=>{
   const user = req.body.followingIndex;
   db.query(`delete from following where id='${req.session.idname}' and following_id = '${user.split('-')[0]}'`, (err, data)=>{
     if(err) next(new Error('팔로잉 실패'));
     return res.end();
   })
+});
+// 좋아요 추가 라우터
+app.post('/add_like',(req, res)=>{
+  const like = req.body;
+  db.query(`insert into post_likes values (${like.likePostID}, '${req.session.idname}')`,(err, data)=>{
+    if(err) next(new Error('좋아요 추가에러'))
+    return res.end();
+  });
 })
+// 좋아요 취소 라우터
+app.post('/cancel_like',(req, res)=>{
+  const like = req.body;
+  db.query(`delete from post_likes where post_id = ${like.likePostID} and likes_id = '${req.session.idname}'`,(err, data)=>{
+    if(err) next(new Error('좋아요 추가에러'))
+    return res.end();
+  });
+});
 app.post('/delete', (req, res)=>{
   const user = req.body;
   console.log(user)
