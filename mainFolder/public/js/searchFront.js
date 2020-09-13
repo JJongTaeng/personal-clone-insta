@@ -26,7 +26,7 @@ window.addEventListener('load', async ()=>{
     const searchLiTag = document.querySelectorAll('.search-people-item');
     for(let i=0; i<search.data.length; i++){
       searchLiTag[i].id = `${search.data[i].id}-${i}`
-      searchLiTag[i].children[0].style.backgroundImage=`url('../${search.data[i].id}/1.jpg')`;
+      searchLiTag[i].children[0].style.backgroundImage=`url('../data/${search.data[i].id}/1.jpg')`;
       searchLiTag[i].children[1].innerHTML = `${search.data[i].nickname}`;
       if(search.data[i].following_id) {
         searchLiTag[i].children[2].innerHTML = `팔로잉`

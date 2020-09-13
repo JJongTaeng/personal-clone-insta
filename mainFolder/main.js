@@ -79,13 +79,13 @@ app.get('/main_data', async (req, res)=>{
   let index;
   db.query(`select post.post_id, id, nickname, content, upload_date from post left join post_content on post.post_id = post_content.post_id where id in (select following_id from following where id ="${user_data.id}");`,async (err, data)=>{
     if(data.length===0){
-      user_data.profile = await fs.readdir(`./public/${user_data.id}`);
+      user_data.profile = await fs.readdir(`./public/data/${user_data.id}`);
       return res.end(JSON.stringify(user_data));
     }
     for(let i=0; i<data.length; i++) {
       // console.log(i);
-      const imageLink = await fs.readdir(`./public/${data[i].post_id}`);
-      user_data.profile = await fs.readdir(`./public/${user_data.id}`);
+      const imageLink = await fs.readdir(`./public/data/${data[i].post_id}`);
+      user_data.profile = await fs.readdir(`./public/data/${user_data.id}`);
       index = data[i].post_id;
       user_data.images[index] = Array.from(imageLink);
       if(i === data.length-1){
@@ -169,7 +169,7 @@ app.post('/signup_process', (req, res, next)=> {
           next(new Error('아이디가 중복됩니다.'));
         } 
         try{
-          fs2.mkdirSync(`./public/${user.id}`);
+          fs2.mkdirSync(`./public/data/${user.id}`);
           res.redirect('/')
         }catch(err){
           next(new Error('아이디가 중복됩니다.'));
@@ -182,7 +182,7 @@ let fileIndex =1;
 let upload = multer({
   storage: multer.diskStorage({
     destination(req, file, done) {
-      done(null, `./public/${postImageLink}`);
+      done(null, `./public/data/${postImageLink}`);
     },
     filename(req, file, done) {
       const ext = path.extname(file.originalname);
@@ -194,11 +194,11 @@ let upload = multer({
 // 게시글 업로드 라우터
 app.post('/insert', async (req, res, next)=>{
   try {
-    fs2.readdirSync(`./public/${req.postImageLink}`);
+    fs2.readdirSync(`./public/data/${req.postImageLink}`);
     
   } catch (error) {
     console.error('uploads 폴더가 없어 uploads 폴더를 생성합니다.');
-    fs2.mkdirSync(`./public/${req.postImageLink}`);
+    fs2.mkdirSync(`./public/data/${req.postImageLink}`);
   }
   console.log('폴더 생성후 파일 저장하러갑니다!')
   next();
@@ -217,7 +217,7 @@ app.post('/insert', async (req, res, next)=>{
 let profile_upload = multer({
   storage: multer.diskStorage({
     destination(req, file, done) {
-      done(null, `./public/${profileImageLink}`);
+      done(null, `./public/data/${profileImageLink}`);
     },
     filename(req, file, done) {
       const ext = '.jpg';
@@ -229,11 +229,11 @@ let profile_upload = multer({
 // 프로필 변경라우터
 app.post('/changeProfile', async (req, res, next)=>{
   try {
-    fs2.readdirSync(`./public/${req.session.idname}`);
+    fs2.readdirSync(`./public/data/${req.session.idname}`);
     
   } catch (error) {
     console.error('uploads 폴더가 없어 uploads 폴더를 생성합니다.');
-    fs2.mkdirSync(`./public/${req.session.idname}`);
+    fs2.mkdirSync(`./public/data/${req.session.idname}`);
   }
   console.log('폴더 생성후 파일 저장하러갑니다!')
   next();
@@ -295,23 +295,27 @@ app.post('/delete', (req, res)=>{
   req.session.deletePostId = user;
   return res.end();
 });
-app.post('/delete_process', (req, res)=>{
+app.post('/delete_process', (req, res, next)=>{
   console.log(req.session.deletePostId.userPostId[1]);
-  db.query(`delete from post where post_id = ${req.session.deletePostId.userPostId[1]}`,async (err, data1)=>{
-    db.query(`delete from post_content where post_id = ${req.session.deletePostId.userPostId[1]}`,async (err, data2)=>{
-      try{
-        const filename = await fs.readdir(`./public/${req.session.deletePostId.userPostId[1]}`);
-        for(let i=0; i<filename.length; i++){
-          await fs.unlink(`./public/${req.session.deletePostId.userPostId[1]}/${filename[i]}`);
-        }
-        await fs.rmdir(`./public/${req.session.deletePostId.userPostId[1]}`)
-        return res.end();
-      }catch {
-  
-      }
+  db.query(`delete from post where post_id = ${req.session.deletePostId.userPostId[1]}`,async (err1, data1)=>{
+    if(err1) next(new Error('삭제 실패'));
+    db.query(`delete from post_content where post_id = ${req.session.deletePostId.userPostId[1]}`,async (err2, data2)=>{
+      if(err2) next(new Error('삭제 실패'));
+      db.query(`delete from post_comment where post_id = ${req.session.deletePostId.userPostId[1]}`,async (err3, data3)=>{
+        if(err3) next(new Error('삭제 실패'));
+        db.query(`delete from post_likes where post_id = ${req.session.deletePostId.userPostId[1]}`,async (err4, data4)=>{
+          if(err4) next(new Error('삭제 실패'));
+            const filename = await fs.readdir(`./public/data/${req.session.deletePostId.userPostId[1]}`);
+            for(let i=0; i<filename.length; i++){
+              await fs.unlink(`./public/data/${req.session.deletePostId.userPostId[1]}/${filename[i]}`);
+            }
+            await fs.rmdir(`./public/data/${req.session.deletePostId.userPostId[1]}`)
+            return res.end();
+        });
+      });
     });
-  })
-})
+  });
+});
 app.use((err, req, res, next)=>{
   res.redirect('/error');
 })

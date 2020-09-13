@@ -109,13 +109,15 @@ button:focus {
   color: #c7c7c7;
   font-size: 11px;
 }
-
-span {
+.side_link span {
   color: #c7c7c7;
   font-size: 11px;
   padding-left: 18px;
 }
 
+.profile-image-label{
+  border: 1px solid #ccc;
+}
 @media(max-width: 600px) {
   .side {
     display: none;

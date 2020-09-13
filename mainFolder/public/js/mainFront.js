@@ -17,7 +17,9 @@ window.addEventListener('load', async () => {
   userInfo.children[0].innerHTML = main.data.nick;
   userInfo.children[1].innerHTML = main.data.name;
   // document.querySelector('.side_img').setAttribute('src', `./${main.data.id}/${main.data.profile[0]}`);
-  document.querySelector('.profile-image-label').style.backgroundImage = `url('./${main.data.id}/${main.data.profile[0]}')`
+  if(main.data.profile.length !==0){
+    document.querySelector('.profile-image-label').style.backgroundImage = `url('../data/${main.data.id}/${main.data.profile[0]}')`
+  }
   const slideHTML = await fetch('../lib/slide');
   if (slideHTML.status === 200) {
     slide_text = await slideHTML.text();
@@ -45,7 +47,7 @@ window.addEventListener('load', async () => {
     let img_index = Object.keys(main.data.images).length - 1;
     for (const imgList in main.data.images) {
       for (let i = 0; i < main.data.images[imgList].length; i++) {
-        postWhole[img_index].children[1].firstElementChild.firstElementChild.children[i].style.backgroundImage = `url('../${imgList}/${main.data.images[imgList][i]}')`;
+        postWhole[img_index].children[1].firstElementChild.firstElementChild.children[i].style.backgroundImage = `url('../data/${imgList}/${main.data.images[imgList][i]}')`;
       }
       img_index--;
     }
@@ -67,7 +69,7 @@ window.addEventListener('load', async () => {
       postContentDate[i] = postWhole[i].children[3].children[3];
       postContentDate[i].innerHTML = main.data.post[(postWhole.length - 1) - i].upload_date.split('T')[0];
       postHeaderImage[i] = postWhole[i].children[0].children[0].children[0];
-      postHeaderImage[i].style.backgroundImage = `url('./${main.data.post[(postWhole.length - 1) - i].id}/${main.data.profile[0]}')`
+      postHeaderImage[i].style.backgroundImage = `url('../data/${main.data.post[(postWhole.length - 1) - i].id}/${main.data.profile[0]}')`
     }
 
     // comment Read 설정 쓰기 설정
@@ -121,7 +123,7 @@ window.addEventListener('load', async () => {
     }
     const storyProfile = document.querySelectorAll('.itembox');
     for (let i = 0; i < postWhole.length; i++) {
-      storyProfile[i].children[0].children[0].setAttribute('src', `./${main.data.post[(postWhole.length - 1) - i].id}/${main.data.profile[0]}`)
+      storyProfile[i].children[0].children[0].setAttribute('src', `../data/${main.data.post[(postWhole.length - 1) - i].id}/${main.data.profile[0]}`)
       storyProfile[i].children[0].setAttribute('href', `#${postWhole[i].id}`)
       storyProfile[i].children[1].innerHTML = `${main.data.post[(postWhole.length - 1) - i].nickname}`;
     }
@@ -256,8 +258,6 @@ window.addEventListener('load', async () => {
       for(let j=0; j<likeData.data.data2.length; j++){
         if(postWhole[i].id.split('-')[1] == likeData.data.data2[j].post_id) {
           likeCount++;
-          postLikes[i].setAttribute('fill', '#ed4956')
-          postLikes[i].firstElementChild.setAttribute('d', "M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z");
           postWhole[i].children[2].children[0].children[1].innerHTML = `${likeCount}명`;
         }
       }
