@@ -43,7 +43,16 @@
     .post-whole {
       margin: 2rem auto;
     }
-
+    @media(max-width: 600px) {
+      .whole-left-section{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .whole-page{
+        width: 100%;
+      }
+    }
     @media(min-width: 1000px) {
       .box {
         margin: 2rem 0 0 auto;
@@ -94,7 +103,13 @@
       font-size: 0.8rem;
       color: dodgerblue;
     }
-
+    .comment-delete {
+      margin-left: 2rem;
+      font-size: 0.7rem;
+      color: #ccc;
+      display: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -144,10 +159,7 @@
           </svg>
         </a>
 
-        <a href="#">
-          <img
-            src="https://scontent-ssn1-1.cdninstagram.com/v/t51.2885-19/s150x150/83659355_3421811387894182_3823429373512384512_n.jpg?_nc_ht=scontent-ssn1-1.cdninstagram.com&amp;_nc_ohc=y-jM1QPyACgAX8OE_sY&amp;oh=a7c2299f3a418c0e6821804d199b852f&amp;oe=5F7913C6"
-            alt="프로필 사진" class="user_img" />
+        <a href="#" class="user_img">
         </a>
       </div>
     </div>

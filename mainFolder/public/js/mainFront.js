@@ -1,5 +1,17 @@
 const logoutBtn = document.querySelector('.logout');
-
+const navImage = document.querySelector('.user_img');
+const postCommentUlTag = {};
+let main;
+let mainAxios; 
+let mainAxiosID;
+let mainAxiosImages;
+let mainAxiosPost;
+let commentData;
+let commentDataAxios;
+let likeData;
+let likeDataAxios;
+let likeDataAxiosMy;
+let likeDataAxiosAll;
 logoutBtn.addEventListener('click', async () => {
   const logout = await axios.get('/logout');
   console.log(logout)
@@ -7,100 +19,318 @@ logoutBtn.addEventListener('click', async () => {
     location.href = "/";
   }
 })
-window.addEventListener('load', async () => {
-  const main = await axios.get('/main_data');
-  const userInfo = document.querySelector('.side_user_info')
-  const slideSticker = document.querySelector('#sticker');
-  let slide_text;
-  console.log(main.data);
-  // 우측 사이드 프로필
-  userInfo.children[0].innerHTML = main.data.nick;
-  userInfo.children[1].innerHTML = main.data.name;
-  // document.querySelector('.side_img').setAttribute('src', `./${main.data.id}/${main.data.profile[0]}`);
-  if(main.data.profile.length !==0){
-    document.querySelector('.profile-image-label').style.backgroundImage = `url('../data/${main.data.id}/${main.data.profile[0]}')`
+navImage.addEventListener('click', async () => {
+  const logout = await axios.get('/logout');
+  console.log(logout)
+  if (logout.data.startsWith('logout')) {
+    location.href = "/";
   }
-  const slideHTML = await fetch('../lib/slide');
-  if (slideHTML.status === 200) {
-    slide_text = await slideHTML.text();
-  };
-  // 게시물이 한개 이상일때 실행
-  if (main.data.post.length !== 0) {
+})
 
-    for (let i = 0; i < main.data.post.length; i++) {
+async function createSlideHTML(mainAxiosPost) {
+  try {
+    const slideSticker = document.querySelector('#sticker');
+    let slide_text;
+    const slideHTML = await fetch('../lib/slide');
+    if (slideHTML.status === 200) {
+      slide_text = await slideHTML.text();
+    };
+    for (let i = 0; i < mainAxiosPost.length; i++) {
       slideSticker.innerHTML += slide_text;
     }
+  } catch( err) {
+    createSlideHTML(mainAxiosPost);
+  }
+}
 
-    // 게시물 별 이미지 개수에 따른 li 설정
-    const postWhole = document.querySelectorAll('.post-whole');
-    let z = Object.keys(main.data.images).length - 1;
-    for (const liList in main.data.images) {
-      for (let i = 0; i < main.data.images[liList].length; i++) {
+async function createRightHTML(mainAxios, mainAxiosID) {
+  const userInfo = document.querySelector('.side_user_info')
+
+  // 우측 사이드 프로필
+  userInfo.children[0].innerHTML = mainAxios.nick;
+  userInfo.children[1].innerHTML = mainAxios.name;
+  // document.querySelector('.side_img').setAttribute('src', `./${mainAxiosID}/${mainAxios.profile[0]}`);
+  if(mainAxios.profile.length !==0){
+    document.querySelector('.profile-image-label').style.backgroundImage = `url('../data/${mainAxiosID}/${mainAxios.profile[0]}')`
+    navImage.style.backgroundImage = `url('../data/${mainAxiosID}/${mainAxios.profile[0]}')`
+  }
+}
+
+async function createSlideList(mainAxiosImages){
+  const postWhole = document.querySelectorAll('.post-whole');
+    let z = Object.keys(mainAxiosImages).length - 1;
+    console.log(z);
+    for (const liList in mainAxiosImages) {
+      for (let i = 0; i < mainAxiosImages[liList].length; i++) {
+        console.log(mainAxiosImages[liList].length);
         const li = document.createElement('li');
         li.className = 'slide-item';
         postWhole[z].children[1].firstElementChild.firstElementChild.appendChild(li);
       }
       z--;
     }
-
-    // slide-item에 이미지 설정
-    let img_index = Object.keys(main.data.images).length - 1;
-    for (const imgList in main.data.images) {
-      for (let i = 0; i < main.data.images[imgList].length; i++) {
-        postWhole[img_index].children[1].firstElementChild.firstElementChild.children[i].style.backgroundImage = `url('../data/${imgList}/${main.data.images[imgList][i]}')`;
-      }
-      img_index--;
+}
+async function createSlideImage(mainAxiosImages) {
+  const postWhole = document.querySelectorAll('.post-whole')
+  let img_index = Object.keys(mainAxiosImages).length - 1;
+  for (const imgList in mainAxiosImages) {
+    for (let i = 0; i < mainAxiosImages[imgList].length; i++) {
+      postWhole[img_index].children[1].firstElementChild.firstElementChild.children[i].style.backgroundImage = `url('../data/${imgList}/${mainAxiosImages[imgList][i]}')`;
     }
+    img_index--;
+  }
+}
+async function settingSlider(mainAxios, mainAxiosPost) {
+  const postWhole = document.querySelectorAll('.post-whole')
+  const postHeaderId = {};
+  const postHeaderImage = {};
+  const postContentId = {};
+  const postContentText = {};
+  const postContentDate = {};
+  for (let i = 0; i < postWhole.length; i++) {
+    postWhole[i].id = `${mainAxiosPost[(postWhole.length - 1) - i].id}-${mainAxiosPost[(postWhole.length - 1) - i].post_id}`;    // 삭제및 수정 기능구현을 위한 각 게시판별로 사용자 아이디와 연결
+    postHeaderId[i] = postWhole[i].children[0].children[1].children[0]
+    postHeaderId[i].innerHTML = mainAxiosPost[(postWhole.length - 1) - i].nickname;
+    postContentId[i] = postWhole[i].children[3].children[0];
+    postContentId[i].innerHTML = mainAxiosPost[(postWhole.length - 1) - i].nickname;
+    postContentText[i] = postWhole[i].children[3].children[1];
+    postContentText[i].innerHTML = mainAxiosPost[(postWhole.length - 1) - i].content;
+    postContentDate[i] = postWhole[i].children[3].children[3];
+    postContentDate[i].innerHTML = mainAxiosPost[(postWhole.length - 1) - i].upload_date.split('T')[0];
+    postHeaderImage[i] = postWhole[i].children[0].children[0].children[0];
+    postHeaderImage[i].style.backgroundImage = `url('../data/${mainAxiosPost[(postWhole.length - 1) - i].id}/${mainAxios.profile[0]}')`
+  }
+}
+async function createCommentFile(commentDataAxios) {
+  const postWhole = document.querySelectorAll('.post-whole');
 
-    // 게시물 별로 프로필 이미지 및 아이디 설정 // 게시물 별로 postContent 설정
-    const postHeaderId = {};
-    const postHeaderImage = {};
-    const postContentId = {};
-    const postContentText = {};
-    const postContentDate = {};
-    for (let i = 0; i < postWhole.length; i++) {
-      postWhole[i].id = `${main.data.post[(postWhole.length - 1) - i].id}-${main.data.post[(postWhole.length - 1) - i].post_id}`;    // 삭제및 수정 기능구현을 위한 각 게시판별로 사용자 아이디와 연결
-      postHeaderId[i] = postWhole[i].children[0].children[1].children[0]
-      postHeaderId[i].innerHTML = main.data.post[(postWhole.length - 1) - i].nickname;
-      postContentId[i] = postWhole[i].children[3].children[0];
-      postContentId[i].innerHTML = main.data.post[(postWhole.length - 1) - i].nickname;
-      postContentText[i] = postWhole[i].children[3].children[1];
-      postContentText[i].innerHTML = main.data.post[(postWhole.length - 1) - i].content;
-      postContentDate[i] = postWhole[i].children[3].children[3];
-      postContentDate[i].innerHTML = main.data.post[(postWhole.length - 1) - i].upload_date.split('T')[0];
-      postHeaderImage[i] = postWhole[i].children[0].children[0].children[0];
-      postHeaderImage[i].style.backgroundImage = `url('../data/${main.data.post[(postWhole.length - 1) - i].id}/${main.data.profile[0]}')`
-    }
-
-    // comment Read 설정 쓰기 설정
-    const commentData = await axios.get('/comment_data');
-    console.log(commentData.data);
-    const commentHTML = await fetch('../lib/comment');
-    const postCommentUlTag = {};
-    const postCommentInputTag = {};
-    let commentIndex = 0;
-    let comment_text;
-    if (slideHTML.status === 200) {
-      comment_text = await commentHTML.text();
-    };
+  let commentHTML;
+  let comment_text;
+  try {
+    commentHTML = await fetch('../lib/comment');
+    comment_text = await commentHTML.text();
     for (let i = 0; i < postWhole.length; i++) {
       postCommentUlTag[i] = postWhole[i].children[4].children[1]
-      postCommentInputTag[i] = postWhole[i].children[4].children[2].children[0];
-      postCommentInputTag[i].value = main.data.post[(postWhole.length - 1) - i].post_id;  // 가려진 input태그로 post_id전송
-      for (let j = 0; j < commentData.data.length; j++) {
-        if (postWhole[i].id.split('-')[1] == commentData.data[j].post_id) {
+      for (let j = 0; j < commentDataAxios.length; j++) {
+        if (postWhole[i].id.split('-')[1] == commentDataAxios[j].post_id) {
           postCommentUlTag[i].innerHTML += comment_text;
-          postCommentUlTag[i].children[commentIndex].children[0].innerHTML = commentData.data[j].nickname;
-          postCommentUlTag[i].children[commentIndex].children[1].innerHTML = commentData.data[j].comment;
-          postCommentUlTag[i].children[commentIndex].children[2].innerHTML = commentData.data[j].upload_date.split('T')[0];
-          commentIndex++;
-        };
+        }
       }
-      commentIndex = 0;
     }
+  } catch(err){
 
+  }
+}
+async function removeCommentFile(commentDataAxios) {
+  const postWhole = document.querySelectorAll('.post-whole');
+  const postCommentUlTag = {};
+  try {
+    for (let i = 0; i < postWhole.length; i++) {
+      postCommentUlTag[i] = postWhole[i].children[4].children[1]
+      for (let j = 0; j < commentDataAxios.length; j++) {
+        if (postWhole[i].id.split('-')[1] == commentDataAxios[j].post_id) {
+          console.log(postCommentUlTag[i].children[j])
+          postCommentUlTag[i].children[j].remove();
+          
+        }
+      }
+    }
+  } catch(err){
+
+  }
+}
+async function createCommentHTML(mainAxiosPost, commentDataAxios) {
+  const postWhole = document.querySelectorAll('.post-whole')
+  console.log(commentDataAxios);
+    
+  commentData = await axios.get('/comment_data');
+  commentDataAxios = await commentData.data;
+  const postCommentInputTag = {};
+  let commentIndex = 0;
+  
+  for (let i = 0; i < postWhole.length; i++) {
+
+    postCommentInputTag[i] = postWhole[i].children[4].children[2].children[0];
+    postCommentInputTag[i].value = mainAxiosPost[(postWhole.length - 1) - i].post_id;  // 가려진 input태그로 post_id전송
+    for (let j = 0; j < commentDataAxios.length; j++) {
+      console.log("1.",i,":",j);
+      if (postWhole[i].id.split('-')[1] == commentDataAxios[j].post_id) {
+        console.log("2.",i,":",j);
+        // console.log(postCommentUlTag[i].children[commentIndex]);
+        postCommentUlTag[i].children[commentIndex].children[0].innerHTML = commentDataAxios[j].nickname;
+        postCommentUlTag[i].children[commentIndex].children[1].innerHTML = commentDataAxios[j].comment;
+        postCommentUlTag[i].children[commentIndex].children[3].innerHTML = commentDataAxios[j].upload_date.split('T')[0];
+        commentIndex++;
+      };
+    }
+    commentIndex = 0;
+  }
+}
+
+async function deleteComment(mainAxios,mainAxiosPost, commentDataAxios) {
+  const commentDeleteButton = document.querySelectorAll('.comment-delete');
+  const commentList = document.querySelectorAll('.comment-item');
+  for(let i=0; i<commentDataAxios.length; i++){
+    if(mainAxios.nick === commentDataAxios[i].nickname) {
+      commentList[i].addEventListener("mouseover",()=>{
+        commentDeleteButton[i].style.display = 'inline';
+      })
+      commentList[i].addEventListener("mouseout",()=>{
+        commentDeleteButton[i].style.display = 'none';
+      })
+      commentDeleteButton[i].addEventListener('click',async ()=>{
+        const nickname = commentDataAxios[i].nickname;
+        const post_id = commentDataAxios[i].post_id;
+        try{
+          
+          await axios.post('/delete_comment', { post_id, nickname });
+          await removeCommentFile(commentDataAxios)
+          commentData = await axios.get('/comment_data');
+          commentDataAxios = await commentData.data;
+          await createCommentFile(commentDataAxios);
+          await createCommentHTML(mainAxiosPost, commentDataAxios)
+        } catch(err) {
+          console.error(err);
+          alert('댓글 삭제 실패 - retry');
+          // document.location.reload(true);
+        }
+      })
+    }
+  }
+}
+async function initializeData() {
+  try{
+    commentData = await axios.get('/comment_data');
+    commentDataAxios = await commentData.data;
+    main = await axios.get('/main_data');
+    mainAxios = await main.data;
+    mainAxiosID = await mainAxios.id;
+    mainAxiosImages = await mainAxios.images;
+    mainAxiosPost = await mainAxios.post;
+    console.log(mainAxios);
+    likeData  = await axios.get('/like_process');
+    likeDataAxios = await likeData.data;
+    likeDataAxiosMy = await likeDataAxios.data1;
+    likeDataAxiosAll = await likeDataAxios.data2;
+  } catch (err){
+    document.location.reload(true);
+  }
+}
+window.addEventListener('load', async () => {
+  await initializeData();
+
+
+  await createRightHTML(mainAxios, mainAxiosID);
+
+
+  // 게시물이 한개 이상일때 실행
+  if (mainAxiosPost.length !== 0) {
+    
+    await createSlideHTML(mainAxiosPost);
+    // 게시물 별 이미지 개수에 따른 li 설정
+    await createSlideList(mainAxiosImages);
+    // slide-item에 이미지 설정
+    await createSlideImage(mainAxiosImages)
+    await settingSlider(mainAxios, mainAxiosPost)
+    await createCommentFile(commentDataAxios)
+    await createCommentHTML(mainAxiosPost, commentDataAxios)
+    await deleteComment(mainAxios,mainAxiosPost, commentDataAxios)
+    const postWhole = document.querySelectorAll('.post-whole')
+
+    // let img_index = Object.keys(mainAxiosImages).length - 1;
+    // for (const imgList in mainAxiosImages) {
+    //   for (let i = 0; i < mainAxiosImages[imgList].length; i++) {
+    //     postWhole[img_index].children[1].firstElementChild.firstElementChild.children[i].style.backgroundImage = `url('../data/${imgList}/${mainAxiosImages[imgList][i]}')`;
+    //   }
+    //   img_index--;
+    // }
+
+    // 게시물 별로 프로필 이미지 및 아이디 설정 // 게시물 별로 postContent 설정
+    // const postHeaderId = {};
+    // const postHeaderImage = {};
+    // const postContentId = {};
+    // const postContentText = {};
+    // const postContentDate = {};
+    // for (let i = 0; i < postWhole.length; i++) {
+    //   postWhole[i].id = `${mainAxiosPost[(postWhole.length - 1) - i].id}-${mainAxiosPost[(postWhole.length - 1) - i].post_id}`;    // 삭제및 수정 기능구현을 위한 각 게시판별로 사용자 아이디와 연결
+    //   postHeaderId[i] = postWhole[i].children[0].children[1].children[0]
+    //   postHeaderId[i].innerHTML = mainAxiosPost[(postWhole.length - 1) - i].nickname;
+    //   postContentId[i] = postWhole[i].children[3].children[0];
+    //   postContentId[i].innerHTML = mainAxiosPost[(postWhole.length - 1) - i].nickname;
+    //   postContentText[i] = postWhole[i].children[3].children[1];
+    //   postContentText[i].innerHTML = mainAxiosPost[(postWhole.length - 1) - i].content;
+    //   postContentDate[i] = postWhole[i].children[3].children[3];
+    //   postContentDate[i].innerHTML = mainAxiosPost[(postWhole.length - 1) - i].upload_date.split('T')[0];
+    //   postHeaderImage[i] = postWhole[i].children[0].children[0].children[0];
+    //   postHeaderImage[i].style.backgroundImage = `url('../data/${mainAxiosPost[(postWhole.length - 1) - i].id}/${mainAxios.profile[0]}')`
+    // }
+
+
+
+    // comment Read 설정 쓰기 설정
+
+
+    // console.log(commentDataAxios);
+    // let commentHTML;
+    // try {
+    //   commentHTML = await fetch('../lib/comment');
+    // } catch(err){
+    //   document.location.reload(true);
+    // }
+      
+    // const postCommentUlTag = {};
+    // const postCommentInputTag = {};
+    // let commentIndex = 0;
+    // let comment_text;
+    // comment_text = await commentHTML.text();
+    // for (let i = 0; i < postWhole.length; i++) {
+    //   postCommentUlTag[i] = postWhole[i].children[4].children[1]
+    //   postCommentInputTag[i] = postWhole[i].children[4].children[2].children[0];
+    //   postCommentInputTag[i].value = mainAxiosPost[(postWhole.length - 1) - i].post_id;  // 가려진 input태그로 post_id전송
+    //   for (let j = 0; j < commentDataAxios.length; j++) {
+    //     if (postWhole[i].id.split('-')[1] == commentDataAxios[j].post_id) {
+    //       postCommentUlTag[i].innerHTML += comment_text;
+    //       postCommentUlTag[i].children[commentIndex].children[0].innerHTML = commentDataAxios[j].nickname;
+    //       postCommentUlTag[i].children[commentIndex].children[1].innerHTML = commentDataAxios[j].comment;
+    //       postCommentUlTag[i].children[commentIndex].children[3].innerHTML = commentDataAxios[j].upload_date.split('T')[0];
+    //       commentIndex++;
+    //     };
+    //   }
+    //   commentIndex = 0;
+    // }
+    // 댓글삭제 기능
+
+
+    // const commentDeleteButton = document.querySelectorAll('.comment-delete');
+    // const commentList = document.querySelectorAll('.comment-item');
+    // for(let i=0; i<commentDataAxios.length; i++){
+    //   if(mainAxios.nick === commentDataAxios[i].nickname) {
+    //     commentList[i].addEventListener("mouseover",()=>{
+    //       commentDeleteButton[i].style.display = 'inline';
+    //     })
+    //     commentList[i].addEventListener("mouseout",()=>{
+    //       commentDeleteButton[i].style.display = 'none';
+    //     })
+    //     commentDeleteButton[i].addEventListener('click',async ()=>{
+    //       const nickname = commentDataAxios[i].nickname;
+    //       const post_id = commentDataAxios[i].post_id;
+    //       try{
+    //         await axios.post('/delete_comment', { post_id, nickname })
+    //         document.location.reload(true);
+    //       } catch(err) {
+    //         alert('댓글 삭제 실패 - retry');
+    //         document.location.reload(true);
+    //       }
+    //     })
+    //   }
+    // }
     // 스토리 설정
-    const storyHTML = await fetch('../lib/story');
+    let storyHTML;
+    try{
+      storyHTML = await fetch('../lib/story');
+    } catch(err){
+      document.location.reload(true);
+    }
     const storyLeftButton = document.createElement('input');
     const storyRightButton = document.createElement('input');
     const storyBox = document.querySelector('.box');
@@ -113,7 +343,6 @@ window.addEventListener('load', async () => {
 
     let storyText;
 
-    // storyBox.appendChild(storyLeftButton);
 
     if (storyHTML.status === 200) {
       storyText = await storyHTML.text();
@@ -123,9 +352,9 @@ window.addEventListener('load', async () => {
     }
     const storyProfile = document.querySelectorAll('.itembox');
     for (let i = 0; i < postWhole.length; i++) {
-      storyProfile[i].children[0].children[0].setAttribute('src', `../data/${main.data.post[(postWhole.length - 1) - i].id}/${main.data.profile[0]}`)
+      storyProfile[i].children[0].children[0].setAttribute('src', `../data/${mainAxiosPost[(postWhole.length - 1) - i].id}/${mainAxios.profile[0]}`)
       storyProfile[i].children[0].setAttribute('href', `#${postWhole[i].id}`)
-      storyProfile[i].children[1].innerHTML = `${main.data.post[(postWhole.length - 1) - i].nickname}`;
+      storyProfile[i].children[1].innerHTML = `${mainAxiosPost[(postWhole.length - 1) - i].nickname}`;
     }
     storyBox.insertBefore(storyLeftButton, storyBox.firstChild);
     storyBox.appendChild(storyRightButton);
@@ -206,7 +435,7 @@ window.addEventListener('load', async () => {
       modalSVG[i].addEventListener('click', async (e) => {
         let userPostId = e.currentTarget.parentNode.parentNode.parentNode.id.split('-');
         await axios.post('/delete', { userPostId });
-        if (userPostId[0] === main.data.id) {
+        if (userPostId[0] === mainAxiosID) {
           userModal_container.style.display = 'flex';
         } else {
           modal_container.style.display = `flex`;
@@ -217,7 +446,7 @@ window.addEventListener('load', async () => {
     const deletePost = document.querySelector('#delete-post');
     deletePost.addEventListener('click', async () => {
       await axios.post('delete_process');
-      location.reload(true);
+      document.location.reload(true);
     })
 
     modal_container.addEventListener('click', cancelModalHandler);
@@ -243,20 +472,20 @@ window.addEventListener('load', async () => {
         }
       })
     }
-    const likeData = await axios.get('/like_process');
-    console.log(likeData.data);
+
+    console.log(likeDataAxios);
     let likeCount = 0;
     for(let i=0; i<postWhole.length; i++){
-      for(let j=0; j<likeData.data.data1.length; j++){
-        if(postWhole[i].id.split('-')[1] == likeData.data.data1[j].post_id) {
+      for(let j=0; j<likeDataAxiosMy.length; j++){
+        if(postWhole[i].id.split('-')[1] == likeDataAxiosMy[j].post_id) {
           postLikes[i].setAttribute('fill', '#ed4956')
           postLikes[i].firstElementChild.setAttribute('d', "M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z");
         }
       }
     }
     for(let i=0; i<postWhole.length; i++){
-      for(let j=0; j<likeData.data.data2.length; j++){
-        if(postWhole[i].id.split('-')[1] == likeData.data.data2[j].post_id) {
+      for(let j=0; j<likeDataAxiosAll.length; j++){
+        if(postWhole[i].id.split('-')[1] == likeDataAxiosAll[j].post_id) {
           likeCount++;
           postWhole[i].children[2].children[0].children[1].innerHTML = `${likeCount}명`;
         }
