@@ -1,4 +1,5 @@
 const checkLog = console.log;
+var cors = require('cors');
 const express = require('express');
 const path = require('path');
 const mysql = require('mysql');
@@ -20,6 +21,13 @@ app.use(session({
   store: new FileStore(),
 }));
 
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.header("Access-Control-Allow-Headers", "x-access-token, Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+app.use(cors({origin: true, credentials: true}));
 const db = mysql.createConnection({
   hosts: 'localhost',
   user: 'root',
@@ -42,6 +50,38 @@ app.use((req, res, next)=>{
     next();
   });
 });
+// app.get('/android_main', (req, res)=>{
+//   const user_data = {
+//     id: 'anduckwoo',
+//     name: '안덕우',
+//     nick: '안덕우123',
+//     images: {},
+//     post: [],
+//   };
+//   let index;
+//   db.query(`select post.post_id, id, nickname, content, upload_date from post left join post_content on post.post_id = post_content.post_id where id in (select following_id from following where id ="안덕우");`,async (err, data)=>{
+//     if(data.length===0){
+//       user_data.profile = await fs.readdir(`./public/data/안덕우`);
+//       return res.end(JSON.stringify(user_data));
+//     }
+//     for(let i=0; i<data.length; i++) {
+//       // console.log(i);
+//       const imageLink = await fs.readdir(`./public/data/${data[i].post_id}`);
+//       user_data.profile = await fs.readdir(`./public/data/안덕우`);
+//       index = data[i].post_id;
+//       user_data.images[index] = Array.from(imageLink);
+//       if(i === data.length-1){
+//         user_data.post = data;
+//         return res.end(JSON.stringify(user_data));
+//       }
+//     }
+//   })
+// })
+app.get('/android_login', (req, res)=>{
+  db.query(`select id, password from user`, (err, data)=>{
+    return res.end(JSON.stringify(data));
+  })
+})
 app.get('/error', async (req, res)=>{
   const data = await fs.readFile('./public/html/error.html');
   res.end(data);
@@ -161,18 +201,19 @@ app.post('/signup_process', (req, res, next)=> {
   const user = req.body;
   db.query(`insert into user (id, password, nickname, name) values ('${user.id}', '${user.password}', '${user.nickname}', '${user.name}');`,(err1, data1)=>{
     if(err1){
-      next(new Error('아이디가 중복됩니다.'));
+      next(new Error('아이디가 중복됩니다.1'));
     } else {
 
       db.query(`insert into following values ('${user.id}','${user.id}')`, (err2, data2)=>{
         if(err2){
-          next(new Error('아이디가 중복됩니다.'));
+          next(new Error('아이디가 중복됩니다.2'));
         } 
         try{
           fs2.mkdirSync(`./public/data/${user.id}`);
+          fs.copyFile('./public/images/인스타로고.png', `./public/data/${user.id}/1.jpg`);
           res.redirect('/')
         }catch(err){
-          next(new Error('아이디가 중복됩니다.'));
+          next(new Error('아이디가 중복됩니다.3'));
         }   
       })
     }
@@ -289,6 +330,13 @@ app.post('/cancel_like',(req, res)=>{
     return res.end();
   });
 });
+app.post('/delete_comment', (req, res)=>{
+  const comment = req.body;
+  db.query(`delete from post_comment where post_id = ${comment.post_id} and nickname = '${comment.nickname}'`, (err, data)=>{
+    if(err) next(new Error('댓글 삭제 실패'));
+    return res.end();
+  })
+})
 app.post('/delete', (req, res)=>{
   const user = req.body;
   console.log(user)
@@ -310,13 +358,14 @@ app.post('/delete_process', (req, res, next)=>{
               await fs.unlink(`./public/data/${req.session.deletePostId.userPostId[1]}/${filename[i]}`);
             }
             await fs.rmdir(`./public/data/${req.session.deletePostId.userPostId[1]}`)
-            return res.end();
+            return res.end(JSON.stringify(req.session.deletePostId.userPostId[1]));
         });
       });
     });
   });
 });
 app.use((err, req, res, next)=>{
+  console.log(err);
   res.redirect('/error');
 })
-app.listen(3000,()=>console.log('3000 포트 대기'))
+app.listen(8088,()=>console.log('8088 포트 대기'))

@@ -33,6 +33,17 @@ svg,
 .input-box {
   display: flex;
 }
+.user_img {
+  display: block;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+  border: 1px solid #aaa;
+  margin-right: 0.2rem;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 .search {
   width: 220px;
   height: 28px;
@@ -73,6 +84,7 @@ svg,
   }
 } */
 @media (max-width: 650px) {
+  
   .input-box {
     width: 100%;
   }
@@ -84,7 +96,10 @@ svg,
 } */
 }
 @media (max-width: 500px) {
-  .search {
-    display: none;
+  .input-box {
+    width: 100%;
+    position: absolute;
+    width: 100%;
+    top: 2.5rem;
   }
 }
