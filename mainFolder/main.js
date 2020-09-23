@@ -35,7 +35,7 @@ app.use(cors({origin: true, credentials: true}));
 const db = mysql.createConnection({
   hosts: 'localhost',
   user: 'root',
-  password: 'dnflwlq123',
+  password: '',
   database: 'instagram'
 });
 // DB연결
