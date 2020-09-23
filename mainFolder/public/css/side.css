@@ -123,3 +123,18 @@ button:focus {
     display: none;
   }
 }
+
+/* .side-sticker {
+  display: flex;
+  flex-direction: column;
+} */
+.recommend_img{
+  display: block;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}

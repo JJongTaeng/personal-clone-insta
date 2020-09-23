@@ -3,14 +3,18 @@ var cors = require('cors');
 const express = require('express');
 const path = require('path');
 const mysql = require('mysql');
-var multer  = require('multer')
+const multer  = require('multer')
 const fs = require('fs').promises;
 const fs2 = require('fs');
 const session = require('express-session');
 const FileStore = require('session-file-store')(session);
+let {PythonShell} = require('python-shell');
+let pyData;
+// let pyshell = new PythonShell('./public/py/friend-recommend.py');
 const app = new express();
 let postImageLink;
 let profileImageLink;
+
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -38,18 +42,20 @@ const db = mysql.createConnection({
 db.connect();
 app.use((req, res, next)=>{
   db.query(`select * from post order by post_id desc limit 1;`, async (err, data)=>{
-    if(data.length ===0){
+    if(data.length === 0){
       req.postImageLink = 1;
-      postImageLink= req.postImageLink;
+      postImageLink = req.postImageLink;
       profileImageLink = req.session.idname;
     } else {
       req.postImageLink = data[0].post_id + 1;
       postImageLink= req.postImageLink;
       profileImageLink = req.session.idname;
     }
+
     next();
   });
 });
+<<<<<<< HEAD
 // app.get('/android_main', (req, res)=>{
 //   const user_data = {
 //     id: 'anduckwoo',
@@ -77,6 +83,26 @@ app.use((req, res, next)=>{
 //     }
 //   })
 // })
+=======
+
+app.get('/main_friend',(req, res, next)=>{
+  let pyOption = {
+    mode: 'json',
+    pythonPath: '',
+    pythonOptions: ['-u'],
+    scriptPath:'./public/py',
+    args:[req.session.idname]
+  }
+  PythonShell.run('./friend-recommendation.py',pyOption,(err, results)=>{
+    if(err) {
+      console.error(err);
+    }
+    console.log(results);
+    return res.end(JSON.stringify(results));
+  })
+})
+
+>>>>>>> master
 app.get('/android_login', (req, res)=>{
   db.query(`select id, password from user`, (err, data)=>{
     return res.end(JSON.stringify(data));
@@ -88,6 +114,7 @@ app.get('/error', async (req, res)=>{
 });
 app.get('/', async (req, res)=>{
   const data = await fs.readFile('./public/html/login.html');
+  console.log(pyData);
   req.session.is_logined = false;
   res.end(data);
 });
@@ -131,10 +158,10 @@ app.get('/main_data', async (req, res)=>{
       if(i === data.length-1){
         user_data.post = data;
         return res.end(JSON.stringify(user_data));
-      }
-    }
-  })
-})
+      };
+    };
+  });
+});
 
 app.get('/comment_data', (req, res)=>{
   db.query(`select post_comment.id, post_comment.post_id,post_comment.nickname, post_comment.comment, post_comment.upload_date from post left join post_comment on post.post_id = post_comment.post_id  where post.id in (select following_id from following where id ="${req.session.idname}") and post_comment.post_id in (select post_id from post_comment) order by post_comment.post_id desc, post_comment.upload_date asc;`, (err, data)=>{
@@ -150,27 +177,27 @@ app.get('/like_process', (req, res)=>{
       const data = {data1, data2};
       if(err2) next(new Error('좋아요 불러오기 실패'));
       return res.end(JSON.stringify(data));
-    })
-  })
-})
+    });
+  });
+});
 
 app.get('/search_data', async (req, res, next)=>{
   try{
     db.query(`select user.id, nickname, following_id from user left join following on following.id = '${req.session.idname}' and user.id = following.following_id where not user.id='${req.session.idname}' and (user.id like '%${req.session.searchData.search_text}%' or user.nickname like '%${req.session.searchData.search_text}%')`,(err,data)=>{
       if(err) next(new Error('검색오류'));
       return res.end(JSON.stringify(data));
-    })
+    });
   } catch(err) {
     next(new Error('검색오류'));
-  }
-})
+  };
+});
 
 //로그아웃 라우터
 app.get('/logout', async (req, res)=>{
   await req.session.destroy((err)=>{
     return res.end('logout');
   });
-})
+});
 
 // 로그인라우터
 app.post('/login', async (req, res)=>{
@@ -267,6 +294,7 @@ let profile_upload = multer({
   }),
   limits: { fileSize: 5 * 1024 * 1024 },
 });
+
 // 프로필 변경라우터
 app.post('/changeProfile', async (req, res, next)=>{
   try {
@@ -278,7 +306,7 @@ app.post('/changeProfile', async (req, res, next)=>{
   }
   console.log('폴더 생성후 파일 저장하러갑니다!')
   next();
-},profile_upload.single('profile'), (req, res) => {    
+}, profile_upload.single('profile'), (req, res) => {    
   console.log(req.file, req.body); 
   res.redirect('/main');
 });
@@ -306,6 +334,13 @@ app.post('/add_following', (req, res, next)=>{
     return res.end();
   })
 })
+app.post('/right_add_following', (req, res)=>{
+  const user = req.body;
+  db.query(`insert into following values ('${req.session.idname}','${user.idData}')`, (err, data)=>{
+    if(err) next(new Error('팔로잉 실패'));
+    return res.end();
+  })
+})
 //팔로잉 취소라우터
 app.post('/cancel_following', (req, res, next)=>{
   const user = req.body.followingIndex;
@@ -314,6 +349,13 @@ app.post('/cancel_following', (req, res, next)=>{
     return res.end();
   })
 });
+app.post('/right_cancel_following', (req, res)=>{
+  const user = req.body;
+  db.query(`delete from following where id='${req.session.idname}' and following_id = '${user.idData}'`, (err, data)=>{
+    if(err) next(new Error('팔로잉 실패'));
+    return res.end();
+  })
+})
 // 좋아요 추가 라우터
 app.post('/add_like',(req, res)=>{
   const like = req.body;
@@ -321,7 +363,7 @@ app.post('/add_like',(req, res)=>{
     if(err) next(new Error('좋아요 추가에러'))
     return res.end();
   });
-})
+});
 // 좋아요 취소 라우터
 app.post('/cancel_like',(req, res)=>{
   const like = req.body;
@@ -330,6 +372,27 @@ app.post('/cancel_like',(req, res)=>{
     return res.end();
   });
 });
+<<<<<<< HEAD
+=======
+app.post('/nickData', (req, res)=>{
+  let name = req.body;
+  name = Object.keys(name);
+  console.log(name);
+  let result=[];
+  db.query(`select id, nickname from user`, (err, data)=>{
+    console.log(data);
+    for(let j=0; j<name.length; j++){
+      for(let i=0; i<data.length; i++){
+        if(data[i].id == name[j]){
+          result.push(data[i].nickname);
+          // console.log(data[i].nickname);
+        }
+      }
+    }
+    return res.end(JSON.stringify(result));
+  })
+})
+>>>>>>> master
 app.post('/delete_comment', (req, res)=>{
   const comment = req.body;
   db.query(`delete from post_comment where post_id = ${comment.post_id} and nickname = '${comment.nickname}'`, (err, data)=>{
@@ -358,7 +421,7 @@ app.post('/delete_process', (req, res, next)=>{
               await fs.unlink(`./public/data/${req.session.deletePostId.userPostId[1]}/${filename[i]}`);
             }
             await fs.rmdir(`./public/data/${req.session.deletePostId.userPostId[1]}`)
-            return res.end();
+            return res.end(JSON.stringify(req.session.deletePostId.userPostId[1]));
         });
       });
     });
@@ -368,4 +431,8 @@ app.use((err, req, res, next)=>{
   console.log(err);
   res.redirect('/error');
 })
+<<<<<<< HEAD
 app.listen(8088,()=>console.log('8088 포트 대기'))
+=======
+app.listen(3030,()=>console.log('3030 포트 대기'))
+>>>>>>> master
