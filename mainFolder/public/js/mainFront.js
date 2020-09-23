@@ -1,6 +1,7 @@
 const logoutBtn = document.querySelector('.logout');
 const navImage = document.querySelector('.user_img');
 const postCommentUlTag = {};
+// 서버와 주고받는 데이터들.
 let main;
 let mainAxios; 
 let mainAxiosID;
@@ -12,6 +13,9 @@ let likeData;
 let likeDataAxios;
 let likeDataAxiosMy;
 let likeDataAxiosAll;
+let friend;
+let friendData;
+// 로그아웃 설정
 logoutBtn.addEventListener('click', async () => {
   const logout = await axios.get('/logout');
   console.log(logout)
@@ -19,6 +23,7 @@ logoutBtn.addEventListener('click', async () => {
     location.href = "/";
   }
 })
+
 navImage.addEventListener('click', async () => {
   const logout = await axios.get('/logout');
   console.log(logout)
@@ -26,8 +31,8 @@ navImage.addEventListener('click', async () => {
     location.href = "/";
   }
 })
-
-async function createSlideHTML(mainAxiosPost) {
+//  슬라이드 HTML 동적생성
+async function createSlideHTML() {
   try {
     const slideSticker = document.querySelector('#sticker');
     let slide_text;
@@ -42,8 +47,8 @@ async function createSlideHTML(mainAxiosPost) {
     createSlideHTML(mainAxiosPost);
   }
 }
-
-async function createRightHTML(mainAxios, mainAxiosID) {
+//  우측 사이드 프로필 설정
+async function createRightHTML() {
   const userInfo = document.querySelector('.side_user_info')
 
   // 우측 사이드 프로필
@@ -55,14 +60,12 @@ async function createRightHTML(mainAxios, mainAxiosID) {
     navImage.style.backgroundImage = `url('../data/${mainAxiosID}/${mainAxios.profile[0]}')`
   }
 }
-
-async function createSlideList(mainAxiosImages){
+// 포스트 별로 slide-item <li> 태그설정
+async function createSlideList(){
   const postWhole = document.querySelectorAll('.post-whole');
     let z = Object.keys(mainAxiosImages).length - 1;
-    console.log(z);
     for (const liList in mainAxiosImages) {
       for (let i = 0; i < mainAxiosImages[liList].length; i++) {
-        console.log(mainAxiosImages[liList].length);
         const li = document.createElement('li');
         li.className = 'slide-item';
         postWhole[z].children[1].firstElementChild.firstElementChild.appendChild(li);
@@ -70,7 +73,8 @@ async function createSlideList(mainAxiosImages){
       z--;
     }
 }
-async function createSlideImage(mainAxiosImages) {
+// 슬라이드에 이미지 설정
+async function createSlideImage() {
   const postWhole = document.querySelectorAll('.post-whole')
   let img_index = Object.keys(mainAxiosImages).length - 1;
   for (const imgList in mainAxiosImages) {
@@ -80,7 +84,9 @@ async function createSlideImage(mainAxiosImages) {
     img_index--;
   }
 }
-async function settingSlider(mainAxios, mainAxiosPost) {
+
+// 슬라이드에 대부분 설정 ex) id, image, content
+async function settingSlider() {
   const postWhole = document.querySelectorAll('.post-whole')
   const postHeaderId = {};
   const postHeaderImage = {};
@@ -101,7 +107,8 @@ async function settingSlider(mainAxios, mainAxiosPost) {
     postHeaderImage[i].style.backgroundImage = `url('../data/${mainAxiosPost[(postWhole.length - 1) - i].id}/${mainAxios.profile[0]}')`
   }
 }
-async function createCommentFile(commentDataAxios) {
+// comment <li> 설정
+async function createCommentFile() {
   const postWhole = document.querySelectorAll('.post-whole');
 
   let commentHTML;
@@ -121,25 +128,27 @@ async function createCommentFile(commentDataAxios) {
 
   }
 }
-async function removeCommentFile(commentDataAxios) {
-  const postWhole = document.querySelectorAll('.post-whole');
-  const postCommentUlTag = {};
-  try {
-    for (let i = 0; i < postWhole.length; i++) {
-      postCommentUlTag[i] = postWhole[i].children[4].children[1]
-      for (let j = 0; j < commentDataAxios.length; j++) {
-        if (postWhole[i].id.split('-')[1] == commentDataAxios[j].post_id) {
-          console.log(postCommentUlTag[i].children[j])
-          postCommentUlTag[i].children[j].remove();
+// // 댓글 삭제 설정
+// async function removeCommentFile() {
+//   const postWhole = document.querySelectorAll('.post-whole');
+//   const postCommentUlTag = {};
+//   try {
+//     for (let i = 0; i < postWhole.length; i++) {
+//       postCommentUlTag[i] = postWhole[i].children[4].children[1]
+//       for (let j = 0; j < commentDataAxios.length; j++) {
+//         if (postWhole[i].id.split('-')[1] == commentDataAxios[j].post_id) {
+//           console.log(postCommentUlTag[i].children[j])
+//           postCommentUlTag[i].children[j].remove();
           
-        }
-      }
-    }
-  } catch(err){
+//         }
+//       }
+//     }
+//   } catch(err){
 
-  }
-}
-async function createCommentHTML(mainAxiosPost, commentDataAxios) {
+//   }
+// }
+// comment 데이터 설정
+async function createCommentHTML() {
   const postWhole = document.querySelectorAll('.post-whole')
   console.log(commentDataAxios);
     
@@ -166,8 +175,8 @@ async function createCommentHTML(mainAxiosPost, commentDataAxios) {
     commentIndex = 0;
   }
 }
-
-async function deleteComment(mainAxios,mainAxiosPost, commentDataAxios) {
+// 커멘트 삭제
+async function deleteComment() {
   const commentDeleteButton = document.querySelectorAll('.comment-delete');
   const commentList = document.querySelectorAll('.comment-item');
   for(let i=0; i<commentDataAxios.length; i++){
@@ -193,7 +202,7 @@ async function deleteComment(mainAxios,mainAxiosPost, commentDataAxios) {
     }
   }
 }
-
+// 게시물 삭제
 async function deletePost() {
   const postWhole = document.querySelectorAll('.post-whole');
   const userModal_container = document.querySelector('.userModal-container');
@@ -208,8 +217,8 @@ async function deletePost() {
     }
   })
 }
-
-async function createStoryHTML(mainAxiosPost) {
+// 스토리 html 설정
+async function createStoryHTML() {
   const postWhole = document.querySelectorAll('.post-whole');
   const storyLeftButton = document.createElement('input');
   const storyRightButton = document.createElement('input');
@@ -262,6 +271,8 @@ async function createStoryHTML(mainAxiosPost) {
     }, 5);
   });
 }
+
+// 슬라이드 좌우 이동 설정
 async function operateSlider() {
   const postWhole = document.querySelectorAll('.post-whole');
   const LslideSwitch = document.querySelectorAll('.slide-switch-left');
@@ -299,6 +310,8 @@ async function operateSlider() {
     }
   });
 }
+
+// 게시물 모달창 설정
 async function operateModal() {
   const postWhole = document.querySelectorAll('.post-whole');
   const modalSVG = {};
@@ -328,6 +341,8 @@ async function operateModal() {
   modal_container.addEventListener('click', cancelModalHandler);
   userModal_container.addEventListener('click', cancelModalHandler);
 }
+
+// 좋아요 설정
 async function operateLikes() {
   const postWhole = document.querySelectorAll('.post-whole');
   const postLikes = {};
@@ -381,6 +396,63 @@ async function operateLikes() {
   }
 
 }
+const getTarget = (elem, className) =>{
+  while(!elem.classList.contains(className)){
+    elem = elem.parentNode;
+    if(elem.nodeName == 'BODY') {
+      elem = null;
+      return;
+    }
+  }
+  return elem;
+}
+async function operateFollowing() {
+  const side = document.querySelector('.side');
+  side.addEventListener('click', async (e)=>{
+    const followBtn = getTarget(e.target, 'follow_button')
+    if(followBtn){
+      if(followBtn.innerHTML == '팔로우') {
+        followBtn.innerHTML = '팔로잉'
+        followBtn.style.color = 'crimson';
+        console.log(followBtn.parentNode);
+        const idData = followBtn.parentNode.parentNode.children[1].children[1].innerHTML;
+        console.log(idData);
+        await axios.post('/right_add_following',{idData});
+      }
+      else {
+        const idData = followBtn.parentNode.parentNode.children[1].children[1].innerHTML;
+        followBtn.innerHTML = '팔로우'
+        followBtn.style.color = 'dodgerblue';
+        await axios.post('/right_cancel_following',{idData});
+      }
+    }
+  })
+}
+async function setFriendData() {
+  if(friendData[0].length !== 0){
+
+    const sideSticker = document.querySelector('.side-sticker');
+    for(const name in friendData[0]) {
+      const rightHTML = await fetch('../lib/rightFriend');
+      const rightHTMLCotent = await rightHTML.text();
+      sideSticker.innerHTML += rightHTMLCotent;
+    }
+    let x = 0;
+    const recommendInfo = document.querySelectorAll('.recommend_info');
+    const sideUserImage = document.querySelectorAll('.side_user_img_recommend');
+    const data = friendData[0]
+    const nickname = await axios.post('/nickData', data);
+    const nicknameData = await nickname.data;
+    for(const name in friendData[0]){
+      sideUserImage[x].children[0].children[0].style.backgroundImage = `url('../data/${name}/1.jpg')`;
+      recommendInfo[x].children[0].innerHTML = nicknameData[x];
+      recommendInfo[x].children[1].innerHTML = name;
+      x++;
+    }
+  }
+}
+
+//데이터 초기화
 async function initializeData() {
   try{
     commentData = await axios.get('/comment_data');
@@ -395,6 +467,8 @@ async function initializeData() {
     likeDataAxios = await likeData.data;
     likeDataAxiosMy = await likeDataAxios.data1;
     likeDataAxiosAll = await likeDataAxios.data2;
+    friend = await axios.get('/main_friend');
+    friendData = await friend.data;
   } catch (err){
     document.location.reload(true);
   }
@@ -403,27 +477,27 @@ window.addEventListener('load', async () => {
   await initializeData();
 
 
-  await createRightHTML(mainAxios, mainAxiosID);
-
-
+  await createRightHTML();
+  await setFriendData();
+  operateFollowing()
   // 게시물이 한개 이상일때 실행
   if (mainAxiosPost.length !== 0) {
     
-    await createSlideHTML(mainAxiosPost);
+    await createSlideHTML();
     // 게시물 별 이미지 개수에 따른 li 설정
-    await createSlideList(mainAxiosImages);
+    await createSlideList();
     // slide-item에 이미지 설정
-    await createSlideImage(mainAxiosImages)
-    await settingSlider(mainAxios, mainAxiosPost)
-    await createCommentFile(commentDataAxios)
-    await createCommentHTML(mainAxiosPost, commentDataAxios)
-    await deleteComment(mainAxios,mainAxiosPost, commentDataAxios)
-    await createStoryHTML(mainAxiosPost)
+    await createSlideImage()
+    await settingSlider()
+    await createCommentFile()
+    await createCommentHTML()
+    await deleteComment()
+    await createStoryHTML()
     await operateSlider();
     await operateModal();
     await deletePost()
     await  operateLikes();
-
+ 
   }
   // 게시글 작성 모달
   const insertBox = document.querySelector('.insert-box');
