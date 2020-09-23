@@ -35,7 +35,7 @@ app.use(cors({origin: true, credentials: true}));
 const db = mysql.createConnection({
   hosts: 'localhost',
   user: 'root',
-  password: '',
+  password: 'dnflwlq1@#',
   database: 'instagram'
 });
 // DB연결
@@ -55,35 +55,6 @@ app.use((req, res, next)=>{
     next();
   });
 });
-<<<<<<< HEAD
-// app.get('/android_main', (req, res)=>{
-//   const user_data = {
-//     id: 'anduckwoo',
-//     name: '안덕우',
-//     nick: '안덕우123',
-//     images: {},
-//     post: [],
-//   };
-//   let index;
-//   db.query(`select post.post_id, id, nickname, content, upload_date from post left join post_content on post.post_id = post_content.post_id where id in (select following_id from following where id ="안덕우");`,async (err, data)=>{
-//     if(data.length===0){
-//       user_data.profile = await fs.readdir(`./public/data/안덕우`);
-//       return res.end(JSON.stringify(user_data));
-//     }
-//     for(let i=0; i<data.length; i++) {
-//       // console.log(i);
-//       const imageLink = await fs.readdir(`./public/data/${data[i].post_id}`);
-//       user_data.profile = await fs.readdir(`./public/data/안덕우`);
-//       index = data[i].post_id;
-//       user_data.images[index] = Array.from(imageLink);
-//       if(i === data.length-1){
-//         user_data.post = data;
-//         return res.end(JSON.stringify(user_data));
-//       }
-//     }
-//   })
-// })
-=======
 
 app.get('/main_friend',(req, res, next)=>{
   let pyOption = {
@@ -102,7 +73,6 @@ app.get('/main_friend',(req, res, next)=>{
   })
 })
 
->>>>>>> master
 app.get('/android_login', (req, res)=>{
   db.query(`select id, password from user`, (err, data)=>{
     return res.end(JSON.stringify(data));
@@ -372,8 +342,6 @@ app.post('/cancel_like',(req, res)=>{
     return res.end();
   });
 });
-<<<<<<< HEAD
-=======
 app.post('/nickData', (req, res)=>{
   let name = req.body;
   name = Object.keys(name);
@@ -392,7 +360,6 @@ app.post('/nickData', (req, res)=>{
     return res.end(JSON.stringify(result));
   })
 })
->>>>>>> master
 app.post('/delete_comment', (req, res)=>{
   const comment = req.body;
   db.query(`delete from post_comment where post_id = ${comment.post_id} and nickname = '${comment.nickname}'`, (err, data)=>{
@@ -431,8 +398,4 @@ app.use((err, req, res, next)=>{
   console.log(err);
   res.redirect('/error');
 })
-<<<<<<< HEAD
-app.listen(8088,()=>console.log('8088 포트 대기'))
-=======
 app.listen(3030,()=>console.log('3030 포트 대기'))
->>>>>>> master
