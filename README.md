@@ -15,7 +15,7 @@
 
 ### 전체 기능 시연
 
-  <img src="./images/시연.gif" width="800px;">
+  <img src="./images/편집.gif" width="800px;">
 
 ### ToDoList
 
