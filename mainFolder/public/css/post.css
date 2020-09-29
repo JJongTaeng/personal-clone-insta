@@ -186,7 +186,9 @@ html {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  /* word-break:break-all; */
   font-size: 0.8rem;
+  margin-right: 1rem;
 }
 .content-date {
   font-size: 0.8rem;
@@ -296,7 +298,7 @@ html {
   background-position: center;
 }
 .switch {
-  position: relative;
+  position: absolute;
   width: 30px;
   height: 30px;
   border: 0;
@@ -309,11 +311,11 @@ html {
   cursor: pointer;
 }
 .slide-switch-left {
-  left: 10px;
+  left: 1rem;
   top: calc(50% - 15px);
 }
 .slide-switch-right {
-  left: calc(100% - 75px);
+  right: 1rem;
   top: calc(50% - 15px);
 }
 

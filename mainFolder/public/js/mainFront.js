@@ -1,5 +1,7 @@
 const logoutBtn = document.querySelector('.logout');
 const navImage = document.querySelector('.user_img');
+const leftWholePage = document.querySelector('.whole-left-section');
+
 const postCommentUlTag = {};
 // 서버와 주고받는 데이터들.
 let main;
@@ -16,6 +18,20 @@ let likeDataAxiosAll;
 let friend;
 let friendData;
 // 로그아웃 설정
+
+leftWholePage.addEventListener('click', (e)=>{
+  const viewMore = getTarget(e.target, 'view-more');
+  if(viewMore) {
+
+    if(viewMore.parentNode.children[1].style.whiteSpace === 'nowrap' || !viewMore.parentNode.children[1].style.whiteSpace){
+      viewMore.parentNode.children[1].style.whiteSpace = "normal";
+      viewMore.innerHTML ="닫기"
+    }else {
+      viewMore.parentNode.children[1].style.whiteSpace = "nowrap";
+      viewMore.innerHTML ="더 보기"
+    }
+  }
+})
 logoutBtn.addEventListener('click', async () => {
   const logout = await axios.get('/logout');
   console.log(logout)
@@ -106,6 +122,7 @@ async function settingSlider() {
     postHeaderImage[i] = postWhole[i].children[0].children[0].children[0];
     postHeaderImage[i].style.backgroundImage = `url('../data/${mainAxiosPost[(postWhole.length - 1) - i].id}/${mainAxios.profile[0]}')`
   }
+
 }
 // comment <li> 설정
 async function createCommentFile() {
@@ -128,25 +145,7 @@ async function createCommentFile() {
 
   }
 }
-// // 댓글 삭제 설정
-// async function removeCommentFile() {
-//   const postWhole = document.querySelectorAll('.post-whole');
-//   const postCommentUlTag = {};
-//   try {
-//     for (let i = 0; i < postWhole.length; i++) {
-//       postCommentUlTag[i] = postWhole[i].children[4].children[1]
-//       for (let j = 0; j < commentDataAxios.length; j++) {
-//         if (postWhole[i].id.split('-')[1] == commentDataAxios[j].post_id) {
-//           console.log(postCommentUlTag[i].children[j])
-//           postCommentUlTag[i].children[j].remove();
-          
-//         }
-//       }
-//     }
-//   } catch(err){
 
-//   }
-// }
 // comment 데이터 설정
 async function createCommentHTML() {
   const postWhole = document.querySelectorAll('.post-whole')
@@ -289,17 +288,41 @@ async function operateSlider() {
     allPost[i].style.left = `0px`;
     allPost[i].style.width = (containerWidth * slideLength[i]) + 'px';
     slideIndex[i] = 0;
-
+    LslideSwitch[i].style.display="none";
+    if(slideLength[i]==1){
+      LslideSwitch[i].style.display="none";
+      RslideSwitch[i].style.display="none";
+    }
     LslideSwitch[i].addEventListener('click', () => {
-      if (slideIndex[i] === 0) return;
+      if (slideIndex[i] === 0) {
+        return;
+      }
       slideIndex[i]--;
       allPost[i].style.left = -(containerWidth * slideIndex[i]) + 'px';
+      if(slideIndex[i] === 0){
+        LslideSwitch[i].style.display="none";
+      } else {
+        RslideSwitch[i].style.display = "inline"
+      }
     })
     RslideSwitch[i].addEventListener('click', () => {
+      if(slideIndex[i] === slideLength[i] - 2){
+        RslideSwitch[i].style.display="none";
+      } else {
+        LslideSwitch[i].style.display="inline";
+      }
       if (slideIndex[i] === slideLength[i] - 1) return;
       allPost[i].style.left = -(containerWidth * (slideIndex[i] + 1)) + 'px';
       slideIndex[i]++;
     })
+  }
+  const postUserContent = document.querySelectorAll('.post-user-content');
+  const viewMoreElem = document.querySelectorAll('.view-more');
+  for(let i=0; i<postUserContent.length; i++){
+    console.log(postUserContent[i].clientWidth);
+    if((postUserContent[i].clientWidth / containerWidth) < 0.48){
+      viewMoreElem[i].style.display="none"
+    }
   }
   window.addEventListener('resize', () => {
     containerWidth = container.clientWidth;
@@ -307,6 +330,11 @@ async function operateSlider() {
       allPost[i].style.width = `${containerWidth * slideLength[i]}px`;
       allPost[i].style.left = `0px`;
       slideIndex[i] = 0;
+      if((postUserContent[i].clientWidth / containerWidth) < 0.48){
+        viewMoreElem[i].style.display="none"
+      } else{
+        viewMoreElem[i].style.display="inline-block"
+      }
     }
   });
 }
@@ -349,7 +377,6 @@ async function operateLikes() {
   const likePeople ={};
   const likesCount = {};
   
-  console.log(likeDataAxios);
   let likeCount = 0;
   for(let i=0; i<postWhole.length; i++){
     postLikes[i] = postWhole[i].children[2].children[0].children[0];
@@ -382,7 +409,7 @@ async function operateLikes() {
         postLikes[i].firstElementChild.setAttribute('d', "M34.6 3.1c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5s1.1-.2 1.6-.5c1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z");
    
         likePeople[i].innerHTML = `${++likesCount[i]}명`;
-        console.log(likesCount)
+
       } else {
         const likePostID = postWhole[i].id.split('-')[1];
         await axios.post('/cancel_like', {likePostID});
@@ -390,7 +417,6 @@ async function operateLikes() {
         postLikes[i].firstElementChild.setAttribute('d', "M34.6 6.1c5.7 0 10.4 5.2 10.4 11.5 0 6.8-5.9 11-11.5 16S25 41.3 24 41.9c-1.1-.7-4.7-4-9.5-8.3-5.7-5-11.5-9.2-11.5-16C3 11.3 7.7 6.1 13.4 6.1c4.2 0 6.5 2 8.1 4.3 1.9 2.6 2.2 3.9 2.5 3.9.3 0 .6-1.3 2.5-3.9 1.6-2.3 3.9-4.3 8.1-4.3m0-3c-4.5 0-7.9 1.8-10.6 5.6-2.7-3.7-6.1-5.5-10.6-5.5C6 3.1 0 9.6 0 17.6c0 7.3 5.4 12 10.6 16.5.6.5 1.3 1.1 1.9 1.7l2.3 2c4.4 3.9 6.6 5.9 7.6 6.5.5.3 1.1.5 1.6.5.6 0 1.1-.2 1.6-.5 1-.6 2.8-2.2 7.8-6.8l2-1.8c.7-.6 1.3-1.2 2-1.7C42.7 29.6 48 25 48 17.6c0-8-6-14.5-13.4-14.5z")
 
         likePeople[i].innerHTML = `${--likesCount[i]}명`;
-        console.log(likesCount)
       }
     })
   }
@@ -478,7 +504,7 @@ window.addEventListener('load', async () => {
 
 
   await createRightHTML();
-  await setFriendData();
+  setFriendData();
   operateFollowing()
   // 게시물이 한개 이상일때 실행
   if (mainAxiosPost.length !== 0) {
@@ -496,9 +522,11 @@ window.addEventListener('load', async () => {
     await operateSlider();
     await operateModal();
     await deletePost()
-    await  operateLikes();
- 
+    await operateLikes();
+
+
   }
+  
   // 게시글 작성 모달
   const insertBox = document.querySelector('.insert-box');
   const insertButton = document.querySelector('.insert-button');

@@ -34,6 +34,8 @@
   - [x] ~~댓글~~ <small>*2020/09/12*</small>
   - [x] ~~좋아요기능~~ <small>*2020/09/12*</small>
   - [x] ~~스토리 박스 클릭 시 해당 게시물로 이동~~ <small>*2020/09/12*</small>
+  - [x] ~~메인 페이지 우측 사이드 친구추천 기능 ( 사이킷 런을 이용한 머신러닝(협업) )~~ <small>*2020/09/22*</small>
+  - [x] ~~해시태그 검색기능 구현~~ <small>*2020/09/28*</small>
 
 
 1. DB
@@ -135,7 +137,21 @@
     ```javascript
     const login = await axios.post('/login', { id, password }); // axios API를 이용 / async-await을 활용하여 비동기 환경에서 동기처리
     ```
+  - Front (이벤트 위임)
 
+    ```javascript
+    const getTarget = (elem, className) =>{
+      while(!elem.classList.contains(className)) {
+        elem = elem.parentNode;
+        if(elem.nodeName == 'BODY'){
+          elem = null;
+          return;
+        }
+      }
+      return elem;
+    }
+    // getTarget 함수를 사용하여 이벤트 위임을 통해 이벤트 발생
+    ```
   - Back (express + mysql)
 
     ```javascript

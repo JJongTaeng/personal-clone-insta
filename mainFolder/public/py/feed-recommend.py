@@ -7,7 +7,7 @@ import json
 import sys
 import warnings
 warnings.filterwarnings("ignore")
-user='조인태'
+user=sys.argv[1]
 
 db=pymysql.connect(
     user='root',
@@ -26,32 +26,36 @@ try:
     cursor.execute(sql)
     result=cursor.fetchall()
     post_df=pd.DataFrame(result)
+    post_df['post_id']=post_df['post_id'].fillna(0)
+
     # sql2="select post_id,count() as count from post group by id;"
     #각 게시물의 like수 조회
-    sql2="select post_id,count(likes_id) as count from post_likes group by post_id;"
+    sql2="select post.post_id, count(likes_id) as count from post left join post_likes on post.post_id = post_likes.post_id group by post_id ;"
     cursor2.execute(sql2)
     result2=cursor2.fetchall()
     count_df=pd.DataFrame(result2)
 
-    #해당 Id가 like를 누른 post검색
     sql3="select distinct(post.post_id) as post_id from post join following as f on post.id=f.following_id where f.id=%s or post.id=%s;"
     cursor3.execute(sql3,(user,user))
     result3=cursor3.fetchall()
     follow_post_id=pd.DataFrame(result3)
-    # post_df=pd.merge(post_df,follow_df,on="id",how="outer")
     post_df=pd.merge(post_df,count_df,on="post_id",how="outer")
 
     post_df['check']=post_df['post_id'].notna().astype('int').replace(0,0.5)
     post_df['count']=post_df['count'].fillna(0)
     post_df['post_id']=post_df['post_id'].fillna(0)
+    post_df['id']=post_df['id'].fillna(0)
     post_df['check']=post_df['check']*post_df['count']
 
     likes=post_df[['id','post_id','check']]
+    # likes_matrix=likes.pivot_table('check',index='id',columns='post_id')
     likes_matrix=likes.pivot_table('check',index='id',columns='post_id')
-
     likes_matrix.drop(likes_matrix.columns[0],axis=1,inplace=True)
-    likes_matrix=likes_matrix.fillna(0)
+    likes_matrix.drop(likes_matrix.index[0],inplace=True)
+    # print(likes_matrix)
+
     likes_matrix_T=likes_matrix.transpose()
+    likes_matrix_T=likes_matrix_T.fillna(0)
     likes_matrix_T.head()
 
     item_sim=cosine_similarity(likes_matrix_T,likes_matrix_T)
@@ -80,7 +84,6 @@ try:
     #모든 데이터에 대해서 예측 점수 계산
     def predict_likes_sim(likes_arr,item_sim_arr):
         pred=np.zeros(likes_arr.shape)
-        
         for col in range(likes_arr.shape[1]):
             #유사도가 큰 순으로 모든 데이터 행렬의 index변환
             top_item=[np.argsort(item_sim_arr[:,col])[::-1]]
@@ -92,7 +95,9 @@ try:
 
     likes_pred=predict_likes_sim(likes_matrix.values,item_sim_df.values)
 
-    likes_pred_matrix=pd.DataFrame(data=likes_pred,index=likes_matrix.index,columns=likes_matrix.columns)
+    likes_pred_matrix=pd.DataFrame(data=likes_pred,index=likes_matrix.index,
+                                columns=likes_matrix.columns)
+
 
     user_like_id=likes_matrix.loc[user,:]
     user_like_id[user_like_id>0].sort_values(ascending=False)[:]
@@ -100,7 +105,6 @@ try:
     #자신이 좋아요를 누른 것은 뺌
     def get_unlike_likes(likes_matrix,userId):
         user_like=likes_matrix.loc[userId,:]
-        
         already_like=user_like[user_like>0].index.tolist()
         
         like_list=likes_matrix.columns.tolist()
@@ -135,12 +139,10 @@ try:
         result={user:result}
         result=json.dumps(result)
         print(result)
-        # print(json.dumps(dict({user:[1,2,3]})))
     else :
         result={user:result}
         result=json.dumps(result)
         print(result)
-        # print(json.dumps(dict({user:[1,2,3]})))
 except KeyError:
     result=dict({user:''})
     result=json.dumps(result)
