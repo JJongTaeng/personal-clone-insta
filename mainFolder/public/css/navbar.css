@@ -1,9 +1,14 @@
+
 nav {
-  height: 40px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  z-index: 10;
+  height: 54px;
   background-color: white;
   border-bottom: 1px solid #dbdbdb;
 }
-
 .navbar {
   max-width: 920px;
   display: flex;

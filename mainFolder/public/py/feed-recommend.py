@@ -11,7 +11,7 @@ user=sys.argv[1]
 
 db=pymysql.connect(
     user='root',
-    passwd='dnflwlq123',
+    passwd='dlwhwnzjqjrm',
     host='localhost',
     db='instagram',
     charset='utf8'
@@ -50,9 +50,12 @@ try:
     likes=post_df[['id','post_id','check']]
     # likes_matrix=likes.pivot_table('check',index='id',columns='post_id')
     likes_matrix=likes.pivot_table('check',index='id',columns='post_id')
-    likes_matrix.drop(likes_matrix.columns[0],axis=1,inplace=True)
-    likes_matrix.drop(likes_matrix.index[0],inplace=True)
-    # print(likes_matrix)
+    if 0 in likes_matrix.columns:
+        likes_matrix.drop(0,axis=1,inplace=True)
+    if 0 in likes_matrix.index:
+        likes_matrix.drop(0,inplace=True)
+        
+    likes_matrix.fillna(0,inplace=True)
 
     likes_matrix_T=likes_matrix.transpose()
     likes_matrix_T=likes_matrix_T.fillna(0)
@@ -63,23 +66,6 @@ try:
     item_sim_df=pd.DataFrame(data=item_sim,index=likes_matrix.columns,columns=likes_matrix.columns)
 
     item_sim_df.head(3)
-
-    #예측 like -> 사용자가 좋아요한 게시글에 그와 유사한 게시글의 합
-    def predict_likes(likes_arr,item_sim_arr):
-        likes_pred=likes_arr.dot(item_sim_arr)/np.array([np.abs(item_sim_arr).sum(axis=1)])
-        return likes_pred
-
-    #결국 각각에 대한 점수들이 매겨짐 -> 유사도에 따른 예측 점수
-    likes_pred=predict_likes(likes_matrix.values,item_sim_df.values)
-    likes_pred_matrix=pd.DataFrame(data=likes_pred,index=likes_matrix.index,columns=likes_matrix.columns)
-    likes_pred_matrix.head(3)
-
-    #원본데이타의 점수와 예측 점수를 비교함
-    #사용자가 조아요를 누른 게시글에 대해서만 예측성능평가 mse를 구함
-    def get_mse(pred,actual):
-        pred=pred[actual.nonzero()].flatten()#0은 빼고 계산
-        actual=actual[actual.nonzero()].flatten()
-        return mean_squared_error(pred,actual)
 
     #모든 데이터에 대해서 예측 점수 계산
     def predict_likes_sim(likes_arr,item_sim_arr):

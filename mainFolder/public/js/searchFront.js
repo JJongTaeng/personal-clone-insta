@@ -1,11 +1,25 @@
 window.addEventListener('load', async ()=>{
-  console.log(document.body.children.length);
-  const search = await axios.get('/search_data');
+  let search
+  let searchData
+  let main
+  let mainData
+  const init = async () =>{
+    search = await axios.get('/search_data');
+    searchData = await search.data;
+    main = await axios.get('/main_data')
+    mainData = await main.data
+  }
+  try{
+    await init()
+  }catch(err) {
+    await init()
+  }
   const searchBox = document.querySelector('.search-people-box');
   const searchUlTag = document.querySelector('.search-people-list');
-
+  const navImage = document.querySelector('.user_img');
+  navImage.style.backgroundImage = `url('../data/${mainData.id}/1.jpg')`
   let searchHTMLData;
-  if(search.data.length === 0) {
+  if(searchData.length === 0) {
     const noDataElement = document.createElement('p');
     noDataElement.style.fontSize="2rem";
     noDataElement.style.color="#666";
@@ -19,16 +33,16 @@ window.addEventListener('load', async ()=>{
     if (searchHTML.status === 200) {
       searchHTMLData = await searchHTML.text();
     };
-    for(let i=0; i<search.data.length; i++){
+    for(let i=0; i<searchData.length; i++){
       searchUlTag.innerHTML += searchHTMLData;
 
     }
     const searchLiTag = document.querySelectorAll('.search-people-item');
-    for(let i=0; i<search.data.length; i++){
-      searchLiTag[i].id = `${search.data[i].id}-${i}`
-      searchLiTag[i].children[0].style.backgroundImage=`url('../data/${search.data[i].id}/1.jpg')`;
-      searchLiTag[i].children[1].innerHTML = `${search.data[i].nickname}`;
-      if(search.data[i].following_id) {
+    for(let i=0; i<searchData.length; i++){
+      searchLiTag[i].id = `${searchData[i].id}-${i}`
+      searchLiTag[i].children[0].style.backgroundImage=`url('../data/${searchData[i].id}/1.jpg')`;
+      searchLiTag[i].children[1].innerHTML = `${searchData[i].nickname}`;
+      if(searchData[i].following_id) {
         searchLiTag[i].children[2].innerHTML = `팔로잉`
         searchLiTag[i].children[2].style.color="crimson";
       }else {
@@ -52,3 +66,9 @@ window.addEventListener('load', async ()=>{
   }
 })
 
+document.querySelector('.DM').addEventListener('click', async () => {
+  const logout = await axios.get('/logout');
+  if (logout.data.startsWith('logout')) {
+    location.href = "/";
+  }
+})

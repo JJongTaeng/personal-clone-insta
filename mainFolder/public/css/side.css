@@ -124,10 +124,13 @@ button:focus {
   }
 }
 
-/* .side-sticker {
-  display: flex;
-  flex-direction: column;
-} */
+.side-sticker {
+  overflow-y: scroll;
+  -ms-overflow-style: none;
+  height: 215px;
+}
+.side-sticker::-webkit-scrollbar{ display:none; }
+
 .recommend_img{
   display: block;
   width: 30px;
